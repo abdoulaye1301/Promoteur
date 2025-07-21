@@ -38,7 +38,7 @@ max_date = max(Chargement["Date"])
 # Afficher les résultats
 #st.write(f"Résultats entre {start_date} et {end_date} :")
 
-menu = st.sidebar.selectbox("Navigation", ["Kamlac", "Opération"])
+menu = st.sidebar.selectbox("Navigation", ["Kamlac","TATA 1", "TATA 2","TATA 3"])
 
 if menu == "Kamlac":
     st.subheader("Contenu de la feuille sélectionnée :")
@@ -62,9 +62,9 @@ if menu == "Kamlac":
     st.write(
         "La colonne Opération ne se trouve pas dans les colonnes selectionnées"
     )
-
+    donne_vente = Chargement[Chargement["Operation"] == "Vente"]
     donnee_agre = (
-        Chargement.groupby(["Date", "tata", "Operation","Produit"])
+        donne_vente.groupby(["tata"])
         .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
         .reset_index()
     )
@@ -73,10 +73,10 @@ if menu == "Kamlac":
     donnee_agre = donnee_agre.rename(
         columns={
             "Quantites_Cartons": "Quantités",
-            "Montant": "Montant",
+            "Montant": "Montant A verser",
         }
     )
-    donnee_ordre = donnee_agre.sort_values(by=["Date", "tata"], ascending=False)
+    donnee_ordre = donnee_agre.sort_values(by=["tata"], ascending=False)
     #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
     st.dataframe(donnee_ordre)
 
