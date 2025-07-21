@@ -41,8 +41,8 @@ max_date = max(Chargement["Date"])
 menu = st.sidebar.selectbox("Navigation", ["Kamlac","TATA 1", "TATA 2","TATA 3"])
 
 if menu == "Kamlac":
-    st.subheader("Contenu de la feuille sélectionnée :")
-    st.dataframe(Chargement)
+    #st.subheader("Contenu de la feuille sélectionnée :")
+    #st.dataframe(Chargement)
     operation="Kamlac"
 #elif menu == "Opération":
  #   operation = st.sidebar.selectbox(
