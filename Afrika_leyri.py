@@ -10,88 +10,106 @@ st.set_page_config(
 profil = Image.open("Logo Afrika Leyri.png")
 st.logo(profil)
 
-st.title("Éditeur Excel avec plusieurs feuilles")
+st.title("Gestion des Stocks de Produits")
 # Upload du fichier Excel
-Chargement = st.sidebar.file_uploader(" 📁 Charger un fichier Excel", type=["xlsx"])
+Chargement = pd.read_excel("Donnees_Promoteurs.xlsx", engine='openpyxl')
 
-if Chargement:
-    # Lire toutes les feuilles
-    xls = pd.ExcelFile(Chargement)
-    feuilles = xls.sheet_names
+# Définir les chemins des fichiers source et destination
+Chargement["Date"] = Chargement["Date"].dt.date
+# donnee["Mois"] = donnee["Date"].dt.month
 
-    # Choisir une feuille à modifier
-    feuille_selectionnee = st.sidebar.selectbox(
-        "Choisissez une feuille à éditer :", feuilles
+# Choix de l’onglet
+# Définir les bornes du slider
+min_date = min(Chargement["Date"])
+max_date = max(Chargement["Date"])
+
+# Slider Streamlit pour filtrer une plage de dates
+#start_date, end_date = st.slider(
+ #   "Sélectionnez une plage de dates",
+  #  min_value=min_date,
+   # max_value=max_date,
+    #value=(min_date, max_date),  # valeur par défaut (tout)
+    #format="YYYY/MM/DD"
+#)
+
+# Filtrer les données selon la plage sélectionnée
+#donnee = Chargement[(Chargement["Date"] >= start_date) & (Chargement["Date"] <= end_date)]
+
+# Afficher les résultats
+#st.write(f"Résultats entre {start_date} et {end_date} :")
+
+menu = st.sidebar.selectbox("Navigation", ["Kamlac", "Opération"])
+
+if menu == "Kamlac":
+    st.subheader("Contenu de la feuille sélectionnée :")
+    st.dataframe(Chargement)
+    operation="Kamlac"
+#elif menu == "Opération":
+ #   operation = st.sidebar.selectbox(
+ #       "Type d'opération", ("Commande", "Livraison", "Aucune")
+  #  )
+   # donnee = Chargement[Chargement["Operation"] == operation]
+    #if operation == "Aucune":
+     #   nomcol = donnee.columns.tolist()
+      #  nomcol.remove("Prix_Unitaire")
+       # nomcol.remove("Quantites")
+        #nomcol.remove("Produit")
+        #nomcol.remove("Prix Total")
+        #st.dataframe(donnee[nomcol])
+    #else:
+     #   st.dataframe(donnee)
+#else:
+    st.write(
+        "La colonne Opération ne se trouve pas dans les colonnes selectionnées"
     )
-
-    # Charger la feuille sélectionnée
-    donnee = pd.read_excel(xls, sheet_name=feuille_selectionnee)
-    # Définir les chemins des fichiers source et destination
-    donnee["Date"] = donnee["Date"].dt.date
-    donnee["Prix Total"] = donnee["Quantites"] * donnee["Prix_Unitaire"]
-    # donnee["Mois"] = donnee["Date"].dt.month
-
-    # Choix de l’onglet
-    # Définir les bornes du slider
-    min_date = min(donnee["Date"])
-    max_date = max(donnee["Date"])
-
-    # Slider Streamlit pour filtrer une plage de dates
-    start_date, end_date = st.slider(
-        "Sélectionnez une plage de dates",
-        min_value=min_date,
-        max_value=max_date,
-        value=(min_date, max_date),  # valeur par défaut (tout)
-        format="YYYY/MM/DD"
-    )
-
-    # Filtrer les données selon la plage sélectionnée
-    donnee = donnee[(donnee["Date"] >= start_date) & (donnee["Date"] <= end_date)]
-
-    # Afficher les résultats
-    st.write(f"Résultats entre {start_date} et {end_date} :")
-
-    menu = st.sidebar.selectbox("Navigation", ["Kamlac", "Opération"])
-
-    if menu == "Kamlac":
-        st.subheader("Contenu de la feuille sélectionnée :")
-        st.dataframe(donnee)
-        operation="Kamlac"
-    elif menu == "Opération":
-        operation = st.sidebar.selectbox(
-            "Type d'opération", ("Commande", "Livraison", "Aucune")
-        )
-        donnee = donnee[donnee["Operation"] == operation]
-        if operation == "Aucune":
-            nomcol = donnee.columns.tolist()
-            nomcol.remove("Prix_Unitaire")
-            nomcol.remove("Quantites")
-            nomcol.remove("Produit")
-            nomcol.remove("Prix Total")
-            st.dataframe(donnee[nomcol])
-        else:
-            st.dataframe(donnee)
-    else:
-        st.write(
-            "La colonne Opération ne se trouve pas dans les colonnes selectionnées"
-        )
 
     donnee_agre = (
-        donnee.groupby(["Date", "Prenom_Nom_RZ", "secteur","Produit"])
-        .agg({"Quantites": "sum", "Prix Total": "sum"})
+        Chargement.groupby(["Date", "tata", "Operation","Produit"])
+        .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
         .reset_index()
     )
-    
-    st.subheader("Regroupement des ventes et ordonnées par Date et Prénom du RZ")
+
+    st.subheader("Ventes de promoteurs")
     donnee_agre = donnee_agre.rename(
         columns={
-            "Quantites": "Quantités",
-            "Prix Total": "Prix Total",
+            "Quantites_Cartons": "Quantités",
+            "Montant": "Montant",
         }
     )
-    donnee_ordre = donnee_agre.sort_values(by=["Date", "Prenom_Nom_RZ"], ascending=False)
+    donnee_ordre = donnee_agre.sort_values(by=["Date", "tata"], ascending=False)
     #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
     st.dataframe(donnee_ordre)
+
+#-----------------------------------------------------------------#
+    st.subheader("Stock restant après les ventes")
+    # Séparer les opérations
+    stock_lundi = Chargement[Chargement['Operation'] == 'Stock Lundi']
+    ventes = Chargement[Chargement['Operation'] == 'Vente']
+    descente = Chargement[Chargement['Operation'] == 'Stock Descente']
+
+    # Regrouper par tata et produit
+    stock_init = stock_lundi.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+    ventes_total = ventes.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+    stock_descente = descente.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+
+    # Calcul du stock restant
+    stock_restant = stock_init.subtract(ventes_total, fill_value=0)
+
+    # Fusionner les résultats dans un seul DataFrame
+    df_final = stock_restant.reset_index().rename(columns={'Quantites_Cartons': 'Stock Restant'})
+    df_final['Stock Descente'] = df_final.apply(
+        lambda row: stock_descente.get((row['tata'], row['Produit']), 0), axis=1
+    )
+
+    # Ajouter la colonne Statut
+    df_final['Statut'] = df_final.apply(
+        lambda row: 'OK' if row['Stock Restant'] == row['Stock Descente'] else 'Différence',
+        axis=1
+    )
+
+    st.dataframe(df_final)
+#-----------------------------------------------------------------#
+
     nom_nouvelle_feuille = st.sidebar.text_input("Nom de la feuille :",value=operation)
     if st.button("Sauvegarder"):
         # Définir le nom sous lequel la feuille sera enregistrée dans le fichier de destination
@@ -121,7 +139,7 @@ if Chargement:
                     data.to_excel(writer, sheet_name=feuille, index=False)
 
                 # Ajouter la feuille modifiée
-                donnee.to_excel(writer, sheet_name=nom_nouvelle_feuille, index=False)
+                Chargement.to_excel(writer, sheet_name=nom_nouvelle_feuille, index=False)
                 donnee_ordre.to_excel(writer, sheet_name=f"Récapitulatif des {nom_nouvelle_feuille}", index=False)
             
 
@@ -135,5 +153,3 @@ if Chargement:
                 file_name="KAMLAC_RZ.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
-else:
-    st.info("Veuillez charger un fichier pour commencer.")
