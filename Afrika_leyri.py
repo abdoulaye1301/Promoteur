@@ -98,6 +98,10 @@ if menu == "Kamlac":
     df_final['Stock Descente'] = df_final.apply(
         lambda row: stock_descente.get((row['tata'], row['Produit']), 0), axis=1
     )
+    
+    # Arrondir à 2 chiffres après la virgule
+    df_final['Stock Restant'] = df_final['Stock Restant'].astype(float).round(2)
+    df_final['Stock Descente'] = df_final['Stock Descente'].astype(float).round(2)
 
     # Ajouter la colonne Statut
     df_final['Statut'] = df_final.apply(
