@@ -59,9 +59,7 @@ if menu == "Kamlac":
     #else:
      #   st.dataframe(donnee)
 #else:
-    st.write(
-        "La colonne Opération ne se trouve pas dans les colonnes selectionnées"
-    )
+   
     donne_vente = Chargement[Chargement["Operation"] == "Vente"]
     donnee_agre = (
         donne_vente.groupby(["tata"])
