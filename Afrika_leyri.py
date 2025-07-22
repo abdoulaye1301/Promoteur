@@ -93,21 +93,23 @@ if menu == "OMAR":
 
     st.dataframe(df_final)
 #-----------------------------------------------------------------#
+#---------------------------- Rapport de Omar ------------------#
     donnee_agr = (
         donne_vente.groupby(["tata","Produit"])
-        .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
+        .agg({"Quantites_Cartons": "sum"})
         .reset_index()
     )
 
-    st.subheader("Ventes de promoteurs par produit")
+    st.subheader("Ventes par produit et Stock Restant")
     donnee_agr = donnee_agr.rename(
         columns={
             "tata": "TATA",
-            "Quantites_Cartons": "Quantités",
-            "Montant": "Montant A verser",
+            "Quantites_Cartons": "Quantités"
         }
     )
+    donn=df_final.sort_values(by=["tata"], ascending=False)
     donnee_ordr = donnee_agr.sort_values(by=["TATA"], ascending=False)
+    donnee_ordr['Stock Restant'] = donn['Stock Restant']
     #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
     st.dataframe(donnee_ordr)
 #-----------------------------------------------------------------#
