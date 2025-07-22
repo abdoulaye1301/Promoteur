@@ -125,7 +125,7 @@ if menu == "OMAR":
                         cellLoc='center',
                         loc='center')
         table.scale(1, 1.5)
-        plt.title("Rapport de Stock par TATA - 25/07/2022", fontsize=14, weight='bold')
+        plt.title(f"Rapport de Stock du {prom} - {dat}", fontsize=14, weight='bold')
 
         buffer = BytesIO()
         plt.savefig(buffer, format='png', bbox_inches='tight', dpi=200)
