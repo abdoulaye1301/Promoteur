@@ -24,27 +24,8 @@ dat = st.selectbox("Navigation", min_date)
 
 # Choix de l’onglet
 menu = st.sidebar.radio("Navigation", ["OMAR","SAMBOU", "Promoteur"])
+#-----------------------------------------------------------------#
 if menu == "OMAR":
-    #st.subheader("Contenu de la feuille sélectionnée :")
-    #st.dataframe(Chargement)
-    
-    #operation="Kamlac"
-#elif menu == "Opération":
- #   operation = st.sidebar.selectbox(
- #       "Type d'opération", ("Commande", "Livraison", "Aucune")
-  #  )
-   # donnee = Chargement[Chargement["Operation"] == operation]
-    #if operation == "Aucune":
-     #   nomcol = donnee.columns.tolist()
-      #  nomcol.remove("Prix_Unitaire")
-       # nomcol.remove("Quantites")
-        #nomcol.remove("Produit")
-        #nomcol.remove("Prix Total")
-        #st.dataframe(donnee[nomcol])
-    #else:
-     #   st.dataframe(donnee)
-#else:
-   
     donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
     donnee_agre = (
         donne_vente.groupby(["tata"])
