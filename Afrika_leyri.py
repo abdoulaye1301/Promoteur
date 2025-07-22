@@ -19,7 +19,7 @@ Chargement["Date"] = Chargement["Date"].dt.date
 # donnee["Mois"] = donnee["Date"].dt.month
 
 # Choix de l’onglet
-menu = st.sidebar.radio("Navigation", ["OMAR","SAMBOU"])
+menu = st.sidebar.radio("Navigation", ["OMAR","SAMBOU", "Promoteur"])
 if menu == "OMAR":
     #st.subheader("Contenu de la feuille sélectionnée :")
     #st.dataframe(Chargement)
@@ -97,24 +97,24 @@ elif menu == "SAMBOU":
     min_date = min(Chargement["Date"])
     max_date = max(Chargement["Date"])
 
-    # Slider Streamlit pour filtrer une plage de dates
-    #start_date, end_date = st.slider(
-    #   "Sélectionnez une plage de dates",
-    #  min_value=min_date,
-    # max_value=max_date,
-        #value=(min_date, max_date),  # valeur par défaut (tout)
-        #format="YYYY/MM/DD"
-    #)
+    #Slider Streamlit pour filtrer une plage de dates
+    start_date, end_date = st.slider(
+       "Sélectionnez une plage de dates",
+      min_value=min_date,
+     max_value=max_date,
+        value=(min_date, max_date),  # valeur par défaut (tout)
+        format="YYYY/MM/DD"
+    )
 
     # Filtrer les données selon la plage sélectionnée
-    #donnee = Chargement[(Chargement["Date"] >= start_date) & (Chargement["Date"] <= end_date)]
+    donnee = Chargement[(Chargement["Date"] >= start_date) & (Chargement["Date"] <= end_date)]
 
     # Afficher les résultats
     #st.write(f"Résultats entre {start_date} et {end_date} :")
 
     menu_sambou = st.sidebar.selectbox("Navigation", ["TATA 1", "TATA 2","TATA 3"])
-    donnee = Chargement[Chargement["tata"] == menu_sambou]
-    donne_vente = Chargement[Chargement["Operation"] == "Vente"]
+    donnee1 = donnee[donnee["tata"] == menu_sambou]
+    donne_vente = donnee1[donnee1["Operation"] == "Vente"]
     donnee_agre = (
         donne_vente.groupby(["tata","Prenom_Nom_Promoteur","Produit"])
         .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
@@ -138,3 +138,47 @@ elif menu == "SAMBOU":
     colone[0].metric("💴 CA TATA 1", f"{donnee_ordre[donnee_ordre["TATA"] =="TATA 1"]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
     colone[1].metric("💴 CA TATA 2", f"{donnee_ordre[donnee_ordre["TATA"] =="TATA 2"]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
     colone[2].metric("💴 CA TATA 3", f"{donnee_ordre[donnee_ordre["TATA"] =="TATA 3"]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
+#-----------------------------------------------------------------#
+elif menu == "Promoteur":
+    # Définir les bornes du slider
+    min_date = min(Chargement["Date"])
+    max_date = max(Chargement["Date"])
+
+    #Slider Streamlit pour filtrer une plage de dates
+    start_date, end_date = st.slider(
+       "Sélectionnez une plage de dates",
+      min_value=min_date,
+     max_value=max_date,
+        value=(min_date, max_date),  # valeur par défaut (tout)
+        format="YYYY/MM/DD"
+    )
+
+    # Filtrer les données selon la plage sélectionnée
+    donnee = Chargement[(Chargement["Date"] >= start_date) & (Chargement["Date"] <= end_date)]
+
+    # Afficher les résultats
+    #st.write(f"Résultats entre {start_date} et {end_date} :")
+
+    prom = st.sidebar.selectbox("Navigation", ["TATA 1", "TATA 2","TATA 3"])
+    donnee1 = donnee[donnee["tata"] == prom]
+    donne_vente = donnee1[donnee1["Operation"] == "Vente"]
+    donnee_agre = (
+        donne_vente.groupby(["tata"])
+        .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
+        .reset_index()
+    )
+
+    st.subheader("Ventes de promoteurs")
+    donnee_agre = donnee_agre.rename(
+        columns={
+            "tata": "TATA",
+            "Quantites_Cartons": "Quantités",
+            "Montant": "Montant A verser",
+        }
+    )
+    donnee_ordre = donnee_agre.sort_values(by=["TATA"], ascending=False)
+    #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
+    st.dataframe(donnee_ordre)
+    
+    colone= st.columns(3)
+    colone[1].metric("💴 CA A VERSER", f"{donnee_ordre[donnee_ordre["TATA"] =="prom"]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
