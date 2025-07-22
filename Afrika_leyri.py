@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from PIL import Image
+import matplotlib.pyplot as plt
 from openpyxl import load_workbook
 import io
 
@@ -43,7 +44,22 @@ if menu == "OMAR":
     donnee_ordre = donnee_agre.sort_values(by=["tata"], ascending=False)
     #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
     st.dataframe(donnee_ordre)
+    # Étape 2 : Génération du PDF avec matplotlib
+    # -----------------------
+   # fig, ax = plt.subplots(figsize=(10, len(df_final)*0.6 + 1))
+   # ax.axis('off')
+    #table = ax.table(cellText=donnee_ordre.values,
+     #               colLabels=donnee_ordre.columns,
+      #              cellLoc='center',
+       #             loc='center')
+    #table.scale(1, 1.5)
+    #plt.title("Rapport de Stock par TATA - Comparaison avec Stock Descente (25-07-22)", fontsize=14, weight='bold')
 
+    # Sauvegarde en PDF
+    #plt.savefig("rapport_stock.pdf", bbox_inches='tight')
+    #plt.close()
+
+    #print("✅ Rapport PDF généré : rapport_stock.pdf")
 #-----------------------------------------------------------------#
     st.subheader("Stock restant après les ventes")
     # Séparer les opérations
@@ -76,6 +92,24 @@ if menu == "OMAR":
     )
 
     st.dataframe(df_final)
+#-----------------------------------------------------------------#
+    donnee_agr = (
+        donne_vente.groupby(["tata","Produit"])
+        .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
+        .reset_index()
+    )
+
+    st.subheader("Ventes de promoteurs par produit")
+    donnee_agr = donnee_agr.rename(
+        columns={
+            "tata": "TATA",
+            "Quantites_Cartons": "Quantités",
+            "Montant": "Montant A verser",
+        }
+    )
+    donnee_ordr = donnee_agr.sort_values(by=["TATA"], ascending=False)
+    #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
+    st.dataframe(donnee_ordr)
 #-----------------------------------------------------------------#
 elif menu == "SAMBOU":
     # Définir les bornes du slider
