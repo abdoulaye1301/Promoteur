@@ -17,6 +17,10 @@ Chargement = pd.read_excel("Donnees_Promoteurs.xlsx", engine='openpyxl')
 # Définir les chemins des fichiers source et destination
 Chargement["Date"] = Chargement["Date"].dt.date
 # donnee["Mois"] = donnee["Date"].dt.month
+# Définir les bornes du slider
+min_date = Chargement["Date"].unique()
+dat = st.selectbox("Navigation", min_date)
+#Slider Streamlit pour filtrer une plage de dates
 
 # Choix de l’onglet
 menu = st.sidebar.radio("Navigation", ["OMAR","SAMBOU", "Promoteur"])
@@ -41,7 +45,7 @@ if menu == "OMAR":
      #   st.dataframe(donnee)
 #else:
    
-    donne_vente = Chargement[Chargement["Operation"] == "Vente"]
+    donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
     donnee_agre = (
         donne_vente.groupby(["tata"])
         .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
@@ -64,7 +68,7 @@ if menu == "OMAR":
     # Séparer les opérations
     stock_lundi = Chargement[Chargement['Operation'] == 'Stock Lundi']
     ventes = Chargement[Chargement['Operation'] == 'Vente']
-    descente = Chargement[Chargement['Operation'] == 'Stock Descente']
+    descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Date'] == dat)]
 
     # Regrouper par tata et produit
     stock_init = stock_lundi.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
