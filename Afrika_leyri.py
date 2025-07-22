@@ -111,7 +111,8 @@ if menu == "OMAR":
     donnee_ordr = donnee_agr.sort_values(by=["TATA"], ascending=False)
     donnee_ordr['Stock Restant'] = donn['Stock Restant']
     #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
-    st.dataframe(donnee_ordr)
+    prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
+    st.dataframe(donnee_ordr[(donnee_ordr["TATA"] == prom)])
 #-----------------------------------------------------------------#
 elif menu == "SAMBOU":
     # Définir les bornes du slider
