@@ -117,24 +117,39 @@ if menu == "OMAR":
       # Étape 2 : Génération du PDF avec matplotlib
     # -----------------------
         # Générer le rapport en image PNG
-    def generate_png_report(df):
-        fig, ax = plt.subplots(figsize=(12, len(df) * 0.6 + 1))
+    # 🔧 Fonction pour créer l'image avec les infos en haut
+    # 🔧 Fonction pour créer l'image avec les infos en haut
+    def generate_png_report(df, date_str, zone_str, nb_promoteurs):
+        fig, ax = plt.subplots(figsize=(12, len(df) * 0.6 + 2))
         ax.axis('off')
+
+        # Texte en haut de l'image
+        text_header = f"Date : {date_str}      Zone : {zone_str}      Nombre de promoteurs : {nb_promoteurs}"
+        plt.text(0.5, 1.05, text_header, ha='center', fontsize=12, transform=ax.transAxes, weight='bold')
+            # En-tête 2 : titre principal
+        plt.text(0.5, 1.001, f"Rapport de Stock du {prom}", ha='center', fontsize=14, transform=ax.transAxes, weight='bold')
+
+        # Tableau
         table = ax.table(cellText=df.values,
                         colLabels=df.columns,
                         cellLoc='center',
                         loc='center')
         table.scale(1, 1.5)
-        plt.title(f"Rapport de Stock du {prom} - {dat}", fontsize=14, weight='bold')
+        #plt.title(f"Rapport de Stock du {prom}", fontsize=14, weight='bold')
+        #plt.title(f"Date : {dat}", fontsize=12, fontname='Times New Roman')
 
         buffer = BytesIO()
         plt.savefig(buffer, format='png', bbox_inches='tight', dpi=200)
         plt.close()
         buffer.seek(0)
         return buffer
-
+    # Calculer le nombre de promoteurs
     # Génération et bouton
-    png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)])
+    # Génération de l'image PNG avec en-tête
+    zone=Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
+    nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["Prenom_Nom_Promoteur"].unique())
+    png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)], dat, zone[0], nb_promoteurs)
+    #png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)])
     st.download_button(
         label="📥 Télécharger le rapport PNG",
         data=png_bytes,
