@@ -138,7 +138,7 @@ if menu == "OMAR":
     st.download_button(
         label="📥 Télécharger le rapport PNG",
         data=png_bytes,
-        file_name="rapport_stock.png",
+        file_name=f"rapport_{prom}.png",
         mime="image/png"
     )
 #-----------------------------------------------------------------#
