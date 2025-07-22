@@ -3,6 +3,7 @@ import pandas as pd
 from PIL import Image
 import matplotlib.pyplot as plt
 from openpyxl import load_workbook
+from io import BytesIO
 import io
 
 st.set_page_config(
@@ -113,6 +114,34 @@ if menu == "OMAR":
     #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
     prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
     st.dataframe(donnee_ordr[(donnee_ordr["TATA"] == prom)])
+      # Étape 2 : Génération du PDF avec matplotlib
+    # -----------------------
+        # Générer le rapport en image PNG
+    def generate_png_report(df):
+        fig, ax = plt.subplots(figsize=(12, len(df) * 0.6 + 1))
+        ax.axis('off')
+        table = ax.table(cellText=df.values,
+                        colLabels=df.columns,
+                        cellLoc='center',
+                        loc='center')
+        table.scale(1, 1.5)
+        plt.title("Rapport de Stock par TATA - 25/07/2022", fontsize=14, weight='bold')
+
+        buffer = BytesIO()
+        plt.savefig(buffer, format='png', bbox_inches='tight', dpi=200)
+        plt.close()
+        buffer.seek(0)
+        return buffer
+
+    # Génération et bouton
+    png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)])
+    st.download_button(
+        label="📥 Télécharger le rapport PNG",
+        data=png_bytes,
+        file_name="rapport_stock.png",
+        mime="image/png"
+    )
+#-----------------------------------------------------------------#
 #-----------------------------------------------------------------#
 elif menu == "SAMBOU":
     # Définir les bornes du slider
