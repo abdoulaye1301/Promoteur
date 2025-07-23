@@ -108,7 +108,6 @@ if menu == "OMAR":
             "Quantites_Cartons": "Quantités vendues"
         }
     )
-    st.write(df_final.columns)
     donn=df_final[["tata","Produit","Stock Restant"]].sort_values(by=["tata"], ascending=False)
     donn= donn.rename(
         columns={"tata": "TATA","Produit":"Produit","Stock Restant":"Stock Restant"})
