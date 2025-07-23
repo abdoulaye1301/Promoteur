@@ -152,7 +152,7 @@ if menu == "OMAR":
     zone=Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
     nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["Prenom_Nom_Promoteur"].unique())
     # Ajout d'une ligne "Total" avec les sommes des colonnes numériques
-    filtre = donnee_ordr[(donnee_ordr["TATA"] == prom)]
+    filtre = donnee_ordr[(donnee_ordr["TATA"] == prom)& (Chargement['Date'] == dat)]
     
     # Calcule des totaux
     quantite_total = filtre['Quantités'].sum().round(2)
