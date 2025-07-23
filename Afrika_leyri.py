@@ -105,12 +105,17 @@ if menu == "OMAR":
     donnee_agr = donnee_agr.rename(
         columns={
             "tata": "TATA",
-            "Quantites_Cartons": "Quantités"
+            "Quantites_Cartons": "Quantités vendues"
         }
     )
-    donn=df_final.sort_values(by=["tata"], ascending=False)
+    st.write(df_final.columns)
+    donn=df_final[["tata","Produit","Stock Restant"]].sort_values(by=["tata"], ascending=False)
+    donn= donn.rename(
+        columns={"tata": "TATA","Produit":"Produit","Stock Restant":"Stock Restant"})
     donnee_ordr = donnee_agr.sort_values(by=["TATA"], ascending=False)
-    donnee_ordr['Stock Restant'] = donn['Stock Restant']
+    
+    # 3. Fusionner les deux sur TATA + Produit
+    donnee_ordr = pd.merge(donn, donnee_ordr, on=["TATA", "Produit"], how="left")
     #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
     prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
     #st.dataframe(donnee_ordr[(donnee_ordr["TATA"] == prom)])
@@ -153,16 +158,16 @@ if menu == "OMAR":
     nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["Prenom_Nom_Promoteur"].unique())
     # Ajout d'une ligne "Total" avec les sommes des colonnes numériques
     filtre = donnee_ordr[(donnee_ordr["TATA"] == prom)]
-    
+    filtre['Quantités vendues'] = filtre['Quantités vendues'].fillna(0)
     # Calcule des totaux
-    quantite_total = filtre['Quantités'].sum().round(2)
+    quantite_total = filtre['Quantités vendues'].sum().round(2)
     stock_restant_total = filtre['Stock Restant'].sum().round(2)
 
     total_row = {
     "TATA": "", 
     "Produit": "TOTAL", 
-    "Quantités": quantite_total, 
-    "Stock Restant": stock_restant_total
+    "Stock Restant": stock_restant_total,
+    "Quantités vendues": quantite_total
 }
     df_final_total = pd.concat([filtre, pd.DataFrame([total_row])], ignore_index=True)
     st.dataframe(df_final_total)
