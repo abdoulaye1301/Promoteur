@@ -23,11 +23,13 @@ Chargement["Date"] = Chargement["Date"].dt.date
 min_date = Chargement["Date"].unique()
 dat = st.selectbox("Navigation", min_date)
 #Slider Streamlit pour filtrer une plage de dates
-
 # Choix de l’onglet
-menu = st.sidebar.radio("Navigation", ["OMAR","SAMBOU", "Promoteur"])
+menu = st.sidebar.radio("Navigation", ["Stock Départ","OMAR","SAMBOU", "Promoteur"])
 #-----------------------------------------------------------------#
-if menu == "OMAR":
+if menu == "Stock Départ":
+    st.subheader("Stock de départ")
+#-----------------------------------------------------------------#
+elif menu == "OMAR":
     donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
     donnee_agre = (
         donne_vente.groupby(["tata"])
@@ -152,7 +154,7 @@ if menu == "OMAR":
     zone=Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
     nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["Prenom_Nom_Promoteur"].unique())
     # Ajout d'une ligne "Total" avec les sommes des colonnes numériques
-    filtre = donnee_ordr[(donnee_ordr["TATA"] == prom)& (Chargement['Date'] == dat)]
+    filtre = donnee_ordr[(donnee_ordr["TATA"] == prom)& (donnee_ordr['Date'] == dat)]
     
     # Calcule des totaux
     quantite_total = filtre['Quantités'].sum().round(2)
