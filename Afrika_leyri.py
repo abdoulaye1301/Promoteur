@@ -113,21 +113,24 @@ if menu == "OMAR":
     donnee_ordr['Stock Restant'] = donn['Stock Restant']
     #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
     prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
-    st.dataframe(donnee_ordr[(donnee_ordr["TATA"] == prom)])
+    #st.dataframe(donnee_ordr[(donnee_ordr["TATA"] == prom)])
       # Étape 2 : Génération du PDF avec matplotlib
     # -----------------------
-        # Générer le rapport en image PNG
-    # 🔧 Fonction pour créer l'image avec les infos en haut
     # 🔧 Fonction pour créer l'image avec les infos en haut
     def generate_png_report(df, date_str, zone_str, nb_promoteurs):
         fig, ax = plt.subplots(figsize=(12, len(df) * 0.6 + 2))
         ax.axis('off')
 
         # Texte en haut de l'image
-        text_header = f"Date : {date_str}      Zone : {zone_str}      Nombre de promoteurs : {nb_promoteurs}"
-        plt.text(0.5, 1.05, text_header, ha='center', fontsize=12, transform=ax.transAxes, weight='bold')
+        
+        plt.text(0.5, 1.10, f"Rapport de Stock du {prom}", ha='center', fontsize=14, transform=ax.transAxes, weight='bold')
+        text_header1 = f"Date : {date_str}"
+        text_header2 = f"Zone : {zone_str}"
+        text_header3 = f"Nombre de promoteurs : {nb_promoteurs}"
+        plt.text(0, 1.07, text_header1, ha='center', fontsize=12, transform=ax.transAxes, weight='bold')
+        plt.text(0, 1.04, text_header2, ha='center', fontsize=12, transform=ax.transAxes, weight='bold')
+        plt.text(0, 1.0, text_header3, ha='center', fontsize=12, transform=ax.transAxes, weight='bold')
             # En-tête 2 : titre principal
-        plt.text(0.5, 1.001, f"Rapport de Stock du {prom}", ha='center', fontsize=14, transform=ax.transAxes, weight='bold')
 
         # Tableau
         table = ax.table(cellText=df.values,
@@ -148,12 +151,27 @@ if menu == "OMAR":
     # Génération de l'image PNG avec en-tête
     zone=Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
     nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["Prenom_Nom_Promoteur"].unique())
-    png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)], dat, zone[0], nb_promoteurs)
+    # Ajout d'une ligne "Total" avec les sommes des colonnes numériques
+    filtre = donnee_ordr[(donnee_ordr["TATA"] == prom)]
+    
+    # Calcule des totaux
+    quantite_total = filtre['Quantités'].sum().round(2)
+    stock_restant_total = filtre['Stock Restant'].sum().round(2)
+
+    total_row = {
+    "TATA": "", 
+    "Produit": "TOTAL", 
+    "Quantités": quantite_total, 
+    "Stock Restant": stock_restant_total
+}
+    df_final_total = pd.concat([filtre, pd.DataFrame([total_row])], ignore_index=True)
+    st.dataframe(df_final_total)
+    png_bytes = generate_png_report(df_final_total, dat, zone[0], nb_promoteurs)
     #png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)])
     st.download_button(
         label="📥 Télécharger le rapport PNG",
         data=png_bytes,
-        file_name=f"rapport_{prom}.png",
+        file_name=f"rapport_{prom}_du_{dat}.png",
         mime="image/png"
     )
 #-----------------------------------------------------------------#
