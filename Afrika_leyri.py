@@ -28,6 +28,7 @@ dat = st.selectbox("Navigation", min_date)
 menu = st.sidebar.radio("Navigation", ["OMAR","SAMBOU", "Promoteur"])
 #-----------------------------------------------------------------#
 if menu == "OMAR":
+    #omar = st.sidebar.radio("Navigation", ["Versement","Stock", "Promoteur"])
     donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
     donnee_agre = (
         donne_vente.groupby(["tata"])
@@ -63,6 +64,7 @@ if menu == "OMAR":
     #print("✅ Rapport PDF généré : rapport_stock.pdf")
 #-----------------------------------------------------------------#
     st.subheader("Stock restant après les ventes")
+    #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
     # Séparer les opérations
     stock_lundi = Chargement[Chargement['Operation'] == 'Stock Lundi']
     ventes = Chargement[Chargement['Operation'] == 'Vente']
@@ -115,8 +117,8 @@ if menu == "OMAR":
     
     # 3. Fusionner les deux sur TATA + Produit
     donnee_ordr = pd.merge(donn, donnee_ordr, on=["TATA", "Produit"], how="left")
-    #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
     prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
+
     #st.dataframe(donnee_ordr[(donnee_ordr["TATA"] == prom)])
       # Étape 2 : Génération du PDF avec matplotlib
     # -----------------------
@@ -169,6 +171,15 @@ if menu == "OMAR":
     "Quantités vendues": quantite_total
 }
     df_final_total = pd.concat([filtre, pd.DataFrame([total_row])], ignore_index=True)
+    # Fonction de style
+    def surligner_stock_bas(val):
+        try:
+            return 'background-color: red' if float(val) < 10 else ''
+        except:
+            return ''
+
+    # Appliquer le style
+    df_final_total.style.applymap(surligner_stock_bas, subset=['Stock Restant'])
     st.dataframe(df_final_total)
     png_bytes = generate_png_report(df_final_total, dat, zone[0], nb_promoteurs)
     #png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)])
