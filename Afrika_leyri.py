@@ -211,7 +211,7 @@ if menu == "OMAR":
     #st.dataframe(df_final_total, use_container_width=True)
     png_bytes = generate_png_report(df_final_total, dat, zone[0], nb_promoteurs)
     # ✅ Afficher l'aperçu de l'image directement dans l'interface
-    st.image(png_bytes, caption="Aperçu du rapport stylisé", use_column_width=True)
+    st.image(png_bytes, caption="", use_container_width=True)
     #png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)])
     st.download_button(
         label="📥 Télécharger le rapport en PNG",
