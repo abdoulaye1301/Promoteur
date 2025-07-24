@@ -43,7 +43,7 @@ if menu == "OMAR":
             .reset_index()
         )
 
-        st.markdown("<h4 style='text-align: center;'>!---------- Versement des promoteurs ----------!</h4><br>", unsafe_allow_html=True)
+        st.markdown(f"<h4 style='text-align: center;'>!---------- Versement des promoteurs du {dat} ----------!</h4><br>", unsafe_allow_html=True)
         #st.subheader("!-------------------- Versement des promoteurs --------------------!")
         donnee_agre = donnee_agre.rename(
             columns={
@@ -59,10 +59,16 @@ if menu == "OMAR":
         colone[0].metric("💴 CA TATA 1", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 1"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
         colone[1].metric("💴 CA TATA 2", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 2"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
         colone[2].metric("💴 CA TATA 3", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 3"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+        colone[0].write(" ")
+        colone[2].write(" ")
+        colone[1].write(" ")
         colonne= st.columns(3)
         colonne[0].metric("💴 Transport TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[1].metric("💴 Transport TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[2].metric("💴 Transport TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[0].write(" ")
+        colonne[2].write(" ")
+        colonne[1].write(" ")
         colonne[0].metric("💴 Stationnement TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[1].metric("💴 Stationnement TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[2].metric("💴 Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
@@ -99,7 +105,8 @@ if menu == "OMAR":
 
     #print("✅ Rapport PDF généré : rapport_stock.pdf")
 #-----------------------------------------------------------------#
-        st.subheader("Stock restant après les ventes")
+        st.markdown(f"<h4 style='text-align: center;'>!---------- Stock restant après les ventes du {dat} ----------!</h4><br>", unsafe_allow_html=True)
+        #st.subheader("Stock restant après les ventes")
         #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
         # Séparer les opérations
         stock_lundi = Chargement[Chargement['Operation'] == 'Stock Lundi']
@@ -138,7 +145,7 @@ if menu == "OMAR":
             .agg({"Quantites_Cartons": "sum"})
             .reset_index()
         )
-        st.markdown("<br><h4 style='text-align: center;'>!---------- Ventes par produit et Stock Restant ----------!</h4>", unsafe_allow_html=True)
+        st.markdown(f"<br><h4 style='text-align: center;'>!---------- Rapport des ventes du {dat} ----------!</h4>", unsafe_allow_html=True)
         #st.subheader("Ventes par produit et Stock Restant")
         donnee_agr = donnee_agr.rename(
             columns={
