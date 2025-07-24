@@ -63,15 +63,15 @@ if menu == "OMAR":
         colone[2].write(" ")
         colone[1].write(" ")
         colonne= st.columns(3)
-        colonne[0].metric("💴 Transport TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[1].metric("💴 Transport TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[2].metric("💴 Transport TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[0].metric("💰 Transport TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[1].metric("💰 Transport TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[2].metric("💰 Transport TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[0].write(" ")
         colonne[2].write(" ")
         colonne[1].write(" ")
-        colonne[0].metric("💴 Stationnement TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[1].metric("💴 Stationnement TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[2].metric("💴 Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[0].metric("💷 Stationnement TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[1].metric("💷 Stationnement TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[2].metric("💷 Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
     elif sous_menu == "Stock":
         donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
         donnee_agre = (
@@ -254,27 +254,29 @@ if menu == "OMAR":
 #-----------------------------------------------------------------#
 elif menu == "SAMBOU":
     # Définir les bornes du slider
-    min_date = min(Chargement["Date"])
-    max_date = max(Chargement["Date"])
+    #min_date = min(Chargement["Date"])
+    #max_date = max(Chargement["Date"])
 
     #Slider Streamlit pour filtrer une plage de dates
-    start_date, end_date = st.slider(
-       "Sélectionnez une plage de dates",
-      min_value=min_date,
-     max_value=max_date,
-        value=(min_date, max_date),  # valeur par défaut (tout)
-        format="YYYY/MM/DD"
-    )
+    #start_date, end_date = st.slider(
+     #  "Sélectionnez une plage de dates",
+     # min_value=min_date,
+     #max_value=max_date,
+      #  value=(min_date, max_date),  # valeur par défaut (tout)
+       # format="YYYY/MM/DD"
+    #)
 
     # Filtrer les données selon la plage sélectionnée
-    donnee = Chargement[(Chargement["Date"] >= start_date) & (Chargement["Date"] <= end_date)]
+    donnee = Chargement[(Chargement["Date"] ==dat) ]
 
     # Afficher les résultats
     #st.write(f"Résultats entre {start_date} et {end_date} :")
-
     menu_sambou = st.sidebar.selectbox("Navigation", ["TATA 1", "TATA 2","TATA 3"])
-    donnee1 = donnee[donnee["tata"] == menu_sambou]
-    donne_vente = donnee1[donnee1["Operation"] == "Vente"]
+    donnee1 = donnee[(donnee["tata"] == menu_sambou)]
+    nom_promo=donnee1["Prenom_Nom_Promoteur"].dropna().unique().tolist()
+    promoteur = st.sidebar.selectbox("Navigation", nom_promo)
+    donnee2 = donnee1[(donnee["Prenom_Nom_Promoteur"] == promoteur)]
+    donne_vente = donnee2[donnee2["Operation"] == "Vente"]
     donnee_agre = (
         donne_vente.groupby(["tata","Prenom_Nom_Promoteur","Produit"])
         .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
@@ -295,7 +297,7 @@ elif menu == "SAMBOU":
     st.dataframe(donnee_ordre)
     
     colone= st.columns(3)
-    colone[0].metric("💴 CA TATA 1", f"{donnee_ordre[donnee_ordre["TATA"] =="TATA 1"]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
-    colone[1].metric("💴 CA TATA 2", f"{donnee_ordre[donnee_ordre["TATA"] =="TATA 2"]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
-    colone[2].metric("💴 CA TATA 3", f"{donnee_ordre[donnee_ordre["TATA"] =="TATA 3"]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
+    colone[1].metric("💴 CA TATA 1", f"{donnee_ordre[donnee_ordre["TATA"] ==menu_sambou]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
+    #colone[1].metric("💴 CA TATA 2", f"{donnee_ordre[donnee_ordre["TATA"] =="TATA 2"]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
+    #colone[2].metric("💴 CA TATA 3", f"{donnee_ordre[donnee_ordre["TATA"] =="TATA 3"]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
 #-----------------------------------------------------------------#
