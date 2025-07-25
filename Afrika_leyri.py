@@ -255,7 +255,7 @@ if menu == "OMAR":
         commente=Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["Commentaire"].dropna().unique().tolist()
         # Si le commentaire est vide, on utilise une chaîne vide
         if len(commente) == 0: 
-            commente.append("Aucune obsevation") 
+            commente.append("Aucune observation") 
         # Ajout d'une ligne "Total" avec les sommes des colonnes numériques
         filtre = donnee_ordr[(donnee_ordr["TATA"] == prom)]
         filtre['Quantités vendues'] = filtre['Quantités vendues'].fillna(0)
