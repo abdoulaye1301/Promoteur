@@ -199,7 +199,7 @@ if menu == "OMAR":
             va='center',
             ha='center',
             style='italic',
-            color='black',
+            color='red',
             wrap=True,
             zorder=2) 
             # Dimensions du rectangle d’en-tête (valeurs relatives à l’axe)
