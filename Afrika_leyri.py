@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 from PIL import Image
+from matplotlib.patches import Rectangle
+from matplotlib.patches import FancyBboxPatch
+import textwrap
 import matplotlib.pyplot as plt
 from openpyxl import load_workbook
 from io import BytesIO
@@ -170,15 +173,52 @@ if menu == "OMAR":
         # Étape 2 : Génération du PDF avec matplotlib
         # -----------------------
         # 🔧 Fonction pour créer l'image avec les infos en haut
-        def generate_png_report(df, date_str, zone_str, nb_promoteurs):
-            fig, ax = plt.subplots(figsize=(12, len(df) * 0.6 + 2))
+        def generate_png_report(df, date_str, zone_str, nb_promoteurs,commentaire):
+            fig, ax = plt.subplots(figsize=(12, len(df) * 0.6+1.5))
             ax.axis('off')
+            # ✅ Texte commentaire à droite du cadre
+            if commentaire:
+                # ✅ Rectangle gris clair pour encadrer le commentaire
+                comment_box = FancyBboxPatch(
+                    (0.63, 0.78),  # position (x, y) en coord. Axes (ajustable)
+                    0.35,          # largeur
+                    0.18,          # hauteur
+                    boxstyle="round,pad=0.01",
+                    transform=ax.transAxes,
+                    linewidth=1,
+                    edgecolor='gray',
+                    facecolor='#f0f0f0',  # gris clair
+                    zorder=1
+                )
+                ax.add_patch(comment_box)
+            # retour à la ligne pour le commentaire
+            wrapped_comment = textwrap.fill(commentaire, width=45)
+            # au-dessus du rectangle
+            ax.text(0.8, 0.88,wrapped_comment,
+            transform=ax.transAxes,
+            fontsize=11,
+            va='center',
+            ha='center',
+            style='italic',
+            color='black',
+            wrap=True,
+            zorder=2) 
+            # Dimensions du rectangle d’en-tête (valeurs relatives à l’axe)
+            header_x = 0.001    # gauche
+            header_y = 0.76    # position verticale bas du bloc
+            header_width = 0.996
+            header_height = 0.24
 
+            # ✅ Dessiner le rectangle d'encadrement
+            rect = Rectangle((header_x, header_y), header_width, header_height,
+                            transform=ax.transAxes,
+                            fill=False, color='black', linewidth=1.5)
+            ax.add_patch(rect)
             # En-tête
-            plt.text(0.5, 1.02, f"Rapport de Stock du {prom}", ha='center', fontsize=14, transform=ax.transAxes, weight='bold')
-            plt.text(0.01, 0.97, f"Date : {date_str}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
-            plt.text(0.01, 0.935, f"Zone : {zone_str}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
-            plt.text(0.01, 0.90, f"Nombre de promoteurs : {nb_promoteurs}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
+            plt.text(0.45, 0.95, f"Rapport de Stock du {prom}", ha='center', fontsize=14, transform=ax.transAxes, weight='bold')
+            plt.text(0.01, 0.89, f"Date : {date_str}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
+            plt.text(0.01, 0.84, f"Zone : {zone_str}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
+            plt.text(0.01, 0.79, f"Nombre de promoteurs : {nb_promoteurs}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
 
             # Tableau matplotlib
             table = ax.table(cellText=df.values,
@@ -213,6 +253,10 @@ if menu == "OMAR":
         # Génération de l'image PNG avec en-tête
         zone=Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
         nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["Prenom_Nom_Promoteur"].unique())
+        commente=Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["Commentaire"].dropna().unique().tolist()
+        # Si le commentaire est vide, on utilise une chaîne vide
+        if len(commente) == 0: 
+            commente.append("Aucune obsevation") 
         # Ajout d'une ligne "Total" avec les sommes des colonnes numériques
         filtre = donnee_ordr[(donnee_ordr["TATA"] == prom)]
         filtre['Quantités vendues'] = filtre['Quantités vendues'].fillna(0)
@@ -240,7 +284,7 @@ if menu == "OMAR":
         # Affichage avec markdown HTML (nécessite unsafe_allow_html=True)
         #st.markdown(styled_df.to_html(escape=False), unsafe_allow_html=True)
         #st.dataframe(df_final_total, use_container_width=True)
-        png_bytes = generate_png_report(df_final_total, dat, zone[0], nb_promoteurs)
+        png_bytes = generate_png_report(df_final_total, dat, zone[0], nb_promoteurs,commente[0])
         # ✅ Afficher l'aperçu de l'image directement dans l'interface
         st.image(png_bytes, caption="", use_container_width=True)
         #png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)])
