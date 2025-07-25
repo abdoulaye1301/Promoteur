@@ -7,7 +7,6 @@ import textwrap
 import matplotlib.pyplot as plt
 from openpyxl import load_workbook
 from io import BytesIO
-import io
 
 st.set_page_config(
     page_title="Ingénieur NDAO", layout="wide", page_icon="ndao abdoulaye.png"
