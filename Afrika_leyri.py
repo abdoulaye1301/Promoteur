@@ -311,14 +311,18 @@ elif menu == "SAMBOU":
 
     # Filtrer les données selon la plage sélectionnée
     donnee = Chargement[(Chargement["Date"] ==dat) ]
-
     # Afficher les résultats
-    #st.write(f"Résultats entre {start_date} et {end_date} :")
-    menu_sambou = st.sidebar.selectbox("Navigation", ["TATA 1", "TATA 2","TATA 3"])
+    menu_sambou = st.sidebar.selectbox("TATAS", ["TATA 1", "TATA 2","TATA 3"])
+    choix= st.sidebar.selectbox("Navigation", ["Promoteur","Promoteur & Produit"])
     donnee1 = donnee[(donnee["tata"] == menu_sambou)]
     nom_promo=donnee1["Prenom_Nom_Promoteur"].dropna().unique().tolist()
     promoteur = st.sidebar.selectbox("Navigation", nom_promo)
-    donnee2 = donnee1[(donnee["Prenom_Nom_Promoteur"] == promoteur)]
+    produit_list=donnee1[donnee1["Operation"] == "Vente"]["Produit"].dropna().unique().tolist()
+    if choix == "Promoteur":
+        donnee2 = donnee1[(donnee["Prenom_Nom_Promoteur"] == promoteur)]
+    else:
+        menu_prin=st.sidebar.selectbox("PRODUITS", produit_list)
+        donnee2 = donnee1[(donnee["Prenom_Nom_Promoteur"] == promoteur)& (donnee["Produit"] == menu_prin)]
     donne_vente = donnee2[donnee2["Operation"] == "Vente"]
     if promoteur=="Autre":
         donnee_agre = (
