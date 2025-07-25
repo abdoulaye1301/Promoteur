@@ -30,6 +30,7 @@ colone= st.columns(5)
 colone[2].write(" ")
 colone[1].write(" ")
 dat = colone[0].selectbox("", min_date)
+datea = dat.strftime("%d-%m-%Y")
 # Choix de l’onglet
 menu = st.sidebar.radio("Navigation", ["OMAR","SAMBOU"])
 #-----------------------------------------------------------------#
@@ -44,8 +45,8 @@ if menu == "OMAR":
             .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
             .reset_index()
         )
-
-        st.markdown(f"<h4 style='text-align: center;'>!---------- Versement des promoteurs du {dat} ----------!</h4><br>", unsafe_allow_html=True)
+        
+        st.markdown(f"<h4 style='text-align: center;'>!---------- Versement des promoteurs du {datea} ----------!</h4><br>", unsafe_allow_html=True)
         #st.subheader("!-------------------- Versement des promoteurs --------------------!")
         donnee_agre = donnee_agre.rename(
             columns={
@@ -54,7 +55,6 @@ if menu == "OMAR":
             }
         )
         donnee_ordre = donnee_agre.sort_values(by=["tata"], ascending=False)
-        #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
         #st.dataframe(donnee_ordre)
 
         colone= st.columns(3)
@@ -107,7 +107,7 @@ if menu == "OMAR":
 
     #print("✅ Rapport PDF généré : rapport_stock.pdf")
 #-----------------------------------------------------------------#
-        st.markdown(f"<h4 style='text-align: center;'>!---------- Stock restant après les ventes du {dat} ----------!</h4><br>", unsafe_allow_html=True)
+        st.markdown(f"<h4 style='text-align: center;'>!---------- Stock restant après les ventes du {datea} ----------!</h4><br>", unsafe_allow_html=True)
         #st.subheader("Stock restant après les ventes")
         #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
         # Séparer les opérations
@@ -147,7 +147,7 @@ if menu == "OMAR":
             .agg({"Quantites_Cartons": "sum"})
             .reset_index()
         )
-        st.markdown(f"<br><h4 style='text-align: center;'>!---------- Rapport des ventes du {dat} ----------!</h4>", unsafe_allow_html=True)
+        st.markdown(f"<br><h4 style='text-align: center;'>!---------- Rapport des ventes du {datea} ----------!</h4>", unsafe_allow_html=True)
         #st.subheader("Ventes par produit et Stock Restant")
         donnee_agr = donnee_agr.rename(
             columns={
@@ -283,14 +283,14 @@ if menu == "OMAR":
         # Affichage avec markdown HTML (nécessite unsafe_allow_html=True)
         #st.markdown(styled_df.to_html(escape=False), unsafe_allow_html=True)
         #st.dataframe(df_final_total, use_container_width=True)
-        png_bytes = generate_png_report(df_final_total, dat, zone[0], nb_promoteurs,commente[0])
+        png_bytes = generate_png_report(df_final_total, datea, zone[0], nb_promoteurs,commente[0])
         # ✅ Afficher l'aperçu de l'image directement dans l'interface
         st.image(png_bytes, caption="", use_container_width=True)
         #png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)])
         st.download_button(
             label="📥 Télécharger le rapport en PNG",
             data=png_bytes,
-            file_name=f"rapport_{prom}_du_{dat}.png",
+            file_name=f"rapport_{prom}_du_{datea}.png",
             mime="image/png"
         )
 #-----------------------------------------------------------------#
