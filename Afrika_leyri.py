@@ -320,22 +320,40 @@ elif menu == "SAMBOU":
     promoteur = st.sidebar.selectbox("Navigation", nom_promo)
     donnee2 = donnee1[(donnee["Prenom_Nom_Promoteur"] == promoteur)]
     donne_vente = donnee2[donnee2["Operation"] == "Vente"]
-    donnee_agre = (
-        donne_vente.groupby(["tata","Prenom_Nom_Promoteur","Produit"])
-        .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
-        .reset_index()
-    )
+    if promoteur=="Autre":
+        donnee_agre = (
+            donne_vente.groupby(["tata","zone","Precisez","Produit"])
+            .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
+            .reset_index()
+        )
 
-    st.subheader("Ventes de promoteurs")
-    donnee_agre = donnee_agre.rename(
-        columns={
-            "tata": "TATA",
-            "Prenom_Nom_Promoteur": "Promoteur",
-            "Quantites_Cartons": "Quantités",
-            "Montant": "Montant A verser",
-        }
-    )
-    donnee_ordre = donnee_agre.sort_values(by=["TATA","Promoteur"], ascending=False)
+        st.subheader("Ventes de promoteurs")
+        donnee_agre = donnee_agre.rename(
+            columns={
+                "tata": "TATA",
+                "Precisez": "RZ",
+                "Quantites_Cartons": "Quantités",
+                "Montant": "Montant A verser",
+            }
+        )
+        donnee_ordre = donnee_agre.sort_values(by=["TATA","RZ"], ascending=False)
+    else:
+        donnee_agre = (
+            donne_vente.groupby(["tata","zone","Prenom_Nom_Promoteur","Produit"])
+            .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
+            .reset_index()
+        )
+
+        st.subheader("Ventes de promoteurs")
+        donnee_agre = donnee_agre.rename(
+            columns={
+                "tata": "TATA",
+                "Prenom_Nom_Promoteur": "Promoteur",
+                "Quantites_Cartons": "Quantités",
+                "Montant": "Montant A verser",
+            }
+        )
+        donnee_ordre = donnee_agre.sort_values(by=["TATA","Promoteur"], ascending=False)
     #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
     st.dataframe(donnee_ordre)
     
