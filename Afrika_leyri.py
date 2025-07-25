@@ -75,6 +75,7 @@ if menu == "OMAR":
         colonne[1].metric("🅿️ Stationnement TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[2].metric("🅿️ Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
     elif sous_menu == "Stock":
+        choix = st.sidebar.selectbox("", ["TATA 1","TATA 2", "TATA 3"])
         donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
         donnee_agre = (
             donne_vente.groupby(["tata"])
@@ -111,9 +112,9 @@ if menu == "OMAR":
         #st.subheader("Stock restant après les ventes")
         #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
         # Séparer les opérations
-        stock_lundi = Chargement[Chargement['Operation'] == 'Stock Lundi']
-        ventes = Chargement[Chargement['Operation'] == 'Vente']
-        descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Date'] == dat)]
+        stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['tata'] == choix)]
+        ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement['tata'] == choix)]
+        descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Date'] == dat) & (Chargement['tata'] == choix)]
 
         # Regrouper par tata et produit
         stock_init = stock_lundi.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
