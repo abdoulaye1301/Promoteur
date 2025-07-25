@@ -65,15 +65,15 @@ if menu == "OMAR":
         colone[2].write(" ")
         colone[1].write(" ")
         colonne= st.columns(3)
-        colonne[0].metric("💰 Transport TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[1].metric("💰 Transport TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[2].metric("💰 Transport TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[0].metric("🚐 Transport TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[1].metric("🚐 Transport TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[2].metric("🚐 Transport TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[0].write(" ")
         colonne[2].write(" ")
         colonne[1].write(" ")
-        colonne[0].metric("💷 Stationnement TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[1].metric("💷 Stationnement TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[2].metric("💷 Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[0].metric("🅿️ Stationnement TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[1].metric("🅿️ Stationnement TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[2].metric("🅿️ Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
     elif sous_menu == "Stock":
         donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
         donnee_agre = (
