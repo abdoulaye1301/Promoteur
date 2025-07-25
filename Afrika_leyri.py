@@ -196,6 +196,7 @@ if menu == "OMAR":
             ax.text(0.8, 0.88,wrapped_comment,
             transform=ax.transAxes,
             fontsize=11,
+            weight='bold',
             va='center',
             ha='center',
             style='italic',
