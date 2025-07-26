@@ -23,23 +23,30 @@ Chargement["Date"] = Chargement["Date"].dt.date
 
 # donnee["Mois"] = donnee["Date"].dt.month
 # Définir les bornes du slider
-min_date = Chargement["Date"].unique()
+num_semaine = Chargement["Numero_semaine"].unique()
 #Slider Streamlit pour filtrer une plage de dates
 
 colone= st.columns(5)
-colone[2].write(" ")
-colone[1].write(" ")
-dat = colone[0].selectbox("", min_date)
-datea = dat.strftime("%d-%m-%Y")
 # Choix de l’onglet
 menu = st.sidebar.radio("Navigation", ["OMAR","SAMBOU"])
+periode = colone[0].selectbox("", ["Jour","Semaine"])
+if periode == "Jour":
+    semaine = colone[1].selectbox("", num_semaine)
+    min_date = Chargement[Chargement["Numero_semaine"] == semaine]["Date"].dropna().unique()
+    dat = colone[2].selectbox("", min_date)
+    datea = dat.strftime("%d-%m-%Y")
+    statio = Chargement[(Chargement["Date"] == dat)]
+    donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
+elif periode == "Semaine":
+    colone[2].write(" ")
+    semaine = colone[1].selectbox("Sélectionnez une semaine", num_semaine)
+    statio = Chargement[(Chargement["Numero_semaine"] == semaine)]
+    datea = semaine
+    donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Numero_semaine"] == semaine)]
 #-----------------------------------------------------------------#
 if menu == "OMAR":
     sous_menu = st.sidebar.selectbox("", ["Versement","Stock"])
     if sous_menu == "Versement":
-        #omar = st.sidebar.radio("Navigation", ["Versement","Stock", "Promoteur"])
-        statio = Chargement[(Chargement["Date"] == dat)]
-        donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
         donnee_agre = (
             donne_vente.groupby(["tata"])
             .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
