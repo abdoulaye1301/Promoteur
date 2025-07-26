@@ -112,7 +112,7 @@ if menu == "OMAR":
         #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
         # Séparer les opérations
         stock_lundi = Chargement[Chargement['Operation'] == 'Stock Lundi']
-        ventes = Chargement[Chargement['Operation'] == 'Vente']
+        ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement["Date"] <= dat)]
         descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Date'] == dat)]
 
         # Regrouper par tata et produit
