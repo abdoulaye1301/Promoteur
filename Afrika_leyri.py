@@ -86,7 +86,7 @@ if menu == "OMAR":
         st.markdown(f"<h4 style='text-align: center;'>!---------- Stock de départ du {datea} ----------!</h4><br>", unsafe_allow_html=True)
         #st.subheader("!-------------------- Stock de départ --------------------!")
         prom = colone[4].selectbox("", ["TATA 1", "TATA 2","TATA 3"])
-        statio1= statio[(statio["tata"] == prom)]
+        statio1= statio[(statio["tata"] == prom) & (statio["Operation"] == "Stock Lundi")]
         donnee_agre = (
             statio1.groupby(["tata", "Produit"])
             .agg({"Quantites_Cartons": "sum",
@@ -346,19 +346,6 @@ if menu == "OMAR":
 #-----------------------------------------------------------------#
 #-----------------------------------------------------------------#
 elif menu == "SAMBOU":
-    # Définir les bornes du slider
-    #min_date = min(Chargement["Date"])
-    #max_date = max(Chargement["Date"])
-
-    #Slider Streamlit pour filtrer une plage de dates
-    #start_date, end_date = st.slider(
-     #  "Sélectionnez une plage de dates",
-     # min_value=min_date,
-     #max_value=max_date,
-      #  value=(min_date, max_date),  # valeur par défaut (tout)
-       # format="YYYY/MM/DD"
-    #)
-
     # Filtrer les données selon la plage sélectionnée
     donnee = Chargement[(Chargement["Date"] ==dat) ]
     # Afficher les résultats
