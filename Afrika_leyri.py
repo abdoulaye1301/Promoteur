@@ -208,8 +208,8 @@ if menu == "OMAR":
 
         
         
-        colo = st.columns(5)
-        prom = colo[2].selectbox("", ["TATA 1", "TATA 2","TATA 3"])
+        #colo = st.columns(5)
+        prom = colone[4].selectbox("", ["TATA 1", "TATA 2","TATA 3"])
 
         #st.dataframe(donnee_ordr[(donnee_ordr["TATA"] == prom)])
         # Étape 2 : Génération du PDF avec matplotlib
@@ -296,12 +296,12 @@ if menu == "OMAR":
         # Génération de l'image PNG avec en-tête
         if periode == "Jour":
             zone = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
-            nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["Prenom_Nom_Promoteur"].unique())
+            nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
             commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["Commentaire"].dropna().unique().tolist()
         elif periode == "Semaine":
             # Pour la semaine, on peut prendre la zone de la première entrée de la semaine
             zone=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["zone"].dropna().unique()
-            nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["Prenom_Nom_Promoteur"].unique())
+            nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
             commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["Commentaire"].dropna().unique().tolist()
         # Si le commentaire est vide, on utilise une chaîne vide
         if len(commente) == 0: 
