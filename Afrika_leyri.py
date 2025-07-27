@@ -82,7 +82,10 @@ if menu == "OMAR":
         colonne[1].metric("🅿️ Stationnement TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[2].metric("🅿️ Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
     elif sous_menu == "Stock":
-        donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
+        if periode == "Jour":
+            donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Numero_semaine"] == semaine) & (Chargement["Date"] == dat)]
+        elif periode == "Semaine":
+            donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Numero_semaine"] == semaine)]
         donnee_agre = (
             donne_vente.groupby(["tata"])
             .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
@@ -118,9 +121,17 @@ if menu == "OMAR":
         #st.subheader("Stock restant après les ventes")
         #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
         # Séparer les opérations
-        stock_lundi = Chargement[Chargement['Operation'] == 'Stock Lundi']
-        ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement["Date"] <= dat)]
-        descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Date'] == dat)]
+        if periode == "Jour":
+            stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine)]
+            ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement['Numero_semaine'] == semaine) & (Chargement["Date"] <= dat)]
+            descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == dat)]
+        elif periode == "Semaine":
+            stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine)]
+            ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement["Numero_semaine"] == semaine)]
+            
+            min_dat = Chargement[Chargement["Numero_semaine"] == semaine]["Date"].dropna().unique()[0]
+            #dat = colone[2].selectbox("", min_date)
+            descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat)]
 
         # Regrouper par tata et produit
         stock_init = stock_lundi.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
@@ -258,9 +269,15 @@ if menu == "OMAR":
         # Calculer le nombre de promoteurs
         # Génération et bouton
         # Génération de l'image PNG avec en-tête
-        zone=Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
-        nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["Prenom_Nom_Promoteur"].unique())
-        commente=Chargement[(Chargement['tata'] == prom) & (Chargement['Date'] == dat)]["Commentaire"].dropna().unique().tolist()
+        if periode == "Jour":
+            zone = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
+            nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["Prenom_Nom_Promoteur"].unique())
+            commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["Commentaire"].dropna().unique().tolist()
+        elif periode == "Semaine":
+            # Pour la semaine, on peut prendre la zone de la première entrée de la semaine
+            zone=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["zone"].dropna().unique()
+            nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["Prenom_Nom_Promoteur"].unique())
+            commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["Commentaire"].dropna().unique().tolist()
         # Si le commentaire est vide, on utilise une chaîne vide
         if len(commente) == 0: 
             commente.append("Aucune observation") 
