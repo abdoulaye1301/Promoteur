@@ -146,10 +146,16 @@ if menu == "OMAR":
         #st.subheader("Stock restant après les ventes")
         #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
         # Séparer les opérations
+        
+        if sous_menu=="Stock":
+            prom = colone[3].selectbox("", ["TATA 1", "TATA 2","TATA 3"])
+        else:
+           prom = colone[4].selectbox("", ["TATA 1", "TATA 2","TATA 3"]) 
+
         if periode == "Jour":
-            stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine)]
-            ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement['Numero_semaine'] == semaine) & (Chargement["Date"] <= dat)]
-            descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == dat)]
+            stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
+            ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement['Numero_semaine'] == semaine) & (Chargement["Date"] <= dat) & (Chargement['tata'] == prom)]
+            descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == dat) & (Chargement['tata'] == prom)]
         elif periode == "Semaine":
             stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine)]
             ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement["Numero_semaine"] == semaine)]
@@ -209,8 +215,6 @@ if menu == "OMAR":
         
         
         #colo = st.columns(5)
-        prom = colone[4].selectbox("", ["TATA 1", "TATA 2","TATA 3"])
-
         #st.dataframe(donnee_ordr[(donnee_ordr["TATA"] == prom)])
         # Étape 2 : Génération du PDF avec matplotlib
         # -----------------------
