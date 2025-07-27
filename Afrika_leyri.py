@@ -31,21 +31,20 @@ colone= st.columns(5)
 menu = st.sidebar.radio("Navigation", ["OMAR","SAMBOU"])
 periode = colone[0].selectbox("", ["Jour","Semaine"])
 if periode == "Jour":
-    semaine = colone[1].selectbox("", num_semaine)
+    semaine = colone[2].selectbox("", num_semaine)
     min_date = Chargement[Chargement["Numero_semaine"] == semaine]["Date"].dropna().unique()
-    dat = colone[2].selectbox("", min_date)
+    dat = colone[4].selectbox("", min_date)
     datea = dat.strftime("%d-%m-%Y")
     statio = Chargement[(Chargement["Date"] == dat)]
     donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
 elif periode == "Semaine":
-    colone[2].write(" ")
-    semaine = colone[1].selectbox("Sélectionnez une semaine", num_semaine)
+    semaine = colone[2].selectbox("Sélectionnez une semaine", num_semaine)
     statio = Chargement[(Chargement["Numero_semaine"] == semaine)]
     datea = semaine
     donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Numero_semaine"] == semaine)]
 #-----------------------------------------------------------------#
 if menu == "OMAR":
-    sous_menu = st.sidebar.selectbox("", ["Versement","Stock"])
+    sous_menu = st.sidebar.selectbox("", ["Versement","Stock","Stock Départ"])
     if sous_menu == "Versement":
         donnee_agre = (
             donne_vente.groupby(["tata"])
@@ -81,6 +80,32 @@ if menu == "OMAR":
         colonne[0].metric("🅿️ Stationnement TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[1].metric("🅿️ Stationnement TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[2].metric("🅿️ Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+    
+
+    elif sous_menu == "Stock Départ" and periode == "Semaine":
+        st.markdown(f"<h4 style='text-align: center;'>!---------- Stock de départ du {datea} ----------!</h4><br>", unsafe_allow_html=True)
+        #st.subheader("!-------------------- Stock de départ --------------------!")
+        prom = colone[4].selectbox("", ["TATA 1", "TATA 2","TATA 3"])
+        statio1= statio[(statio["tata"] == prom)]
+        donnee_agre = (
+            statio1.groupby(["tata", "Produit"])
+            .agg({"Quantites_Cartons": "sum",
+                  "Montant": "sum"})
+            .reset_index()
+        )
+        donnee_agre = donnee_agre.rename(
+            columns={
+                "Quantites_Cartons": "Quantités",
+            }
+        )
+        donnee_ordre = donnee_agre.sort_values(by=["tata"], ascending=False)
+        #colone= st.columns(3)
+        ndao=f"{donnee_ordre[donnee_ordre["tata"] ==prom]["Montant"].sum():,.2f}".replace(",", " ")+" XOF"
+        st.markdown(f"<h2 style='text-align: center;'> CA DU  {prom} : {ndao}</h2><br>", unsafe_allow_html=True)
+        #colone[1].metric(f"💴 Quantités {prom}", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 2"]["Quantité"].sum():,.2f}".replace(",", " "))
+        st.dataframe(donnee_ordre)
+    elif sous_menu == "Stock Départ" and periode == "Jour":
+        st.warning("Cette option n'est disponible que pour la vue Semaine.")
     elif sous_menu == "Stock":
         if periode == "Jour":
             donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Numero_semaine"] == semaine) & (Chargement["Date"] == dat)]
