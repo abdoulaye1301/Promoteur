@@ -187,8 +187,8 @@ if menu == "OMAR":
             lambda row: 'OK' if row['Stock Théorique'] == row['Stock Restant'] else 'Différence',
             axis=1
         )
-
-        st.dataframe(df_final)
+        df_final1 = df_final.drop("tata", axis=1).copy()
+        st.dataframe(df_final1)
     #-----------------------------------------------------------------#
     #---------------------------- Rapport de Omar ------------------#
         donnee_agr = (
@@ -325,6 +325,7 @@ if menu == "OMAR":
         df_final_total = pd.concat([filtre, pd.DataFrame([total_row])], ignore_index=True)
         df_final_total["Stock Restant"] = df_final_total["Stock Restant"].round(2)
         df_final_total["Quantités vendues"] = df_final_total["Quantités vendues"].round(2)
+        df_final_total1 = df_final_total.drop("TATA", axis=1).copy()
         # Style avec HTML
         def highlight_html(val):
             if isinstance(val, (int, float)) and val < 10:
@@ -337,7 +338,7 @@ if menu == "OMAR":
         # Affichage avec markdown HTML (nécessite unsafe_allow_html=True)
         #st.markdown(styled_df.to_html(escape=False), unsafe_allow_html=True)
         #st.dataframe(df_final_total, use_container_width=True)
-        png_bytes = generate_png_report(df_final_total, datea, zone[0], nb_promoteurs,commente[0])
+        png_bytes = generate_png_report(df_final_total1, datea, zone[0], nb_promoteurs,commente[0])
         # ✅ Afficher l'aperçu de l'image directement dans l'interface
         st.image(png_bytes, caption="", use_container_width=True)
         #png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)])
