@@ -352,7 +352,7 @@ if menu == "OMAR":
 #-----------------------------------------------------------------#
 elif menu == "SAMBOU":
     # Filtrer les données selon la plage sélectionnée
-    donnee = Chargement[(Chargement["Date"] ==dat) ]
+    donnee = donne_vente
     # Afficher les résultats
     menu_sambou = st.sidebar.selectbox("TATAS", ["TATA 1", "TATA 2","TATA 3"])
     donnee1 = donnee[(donnee["tata"] == menu_sambou)]
@@ -362,30 +362,49 @@ elif menu == "SAMBOU":
     if tat_indi == "INDIVIDUEL":
         choix= st.sidebar.selectbox("Votre choix", ["Promoteur","Produit"])
         if choix == "Promoteur":
-            promoteur = st.sidebar.selectbox("Promoteurs", nom_promo)
-            donnee2 = donnee1[(donnee["Prenom_Nom_Promoteur"] == promoteur)]
-            donne_vente = donnee2[donnee2["Operation"] == "Vente"]
-            if promoteur=="Autre":
-                donnee_agre = (
-                    donne_vente.groupby(["tata","zone","Precisez","Produit"])
-                    .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
-                    .reset_index()
-                )
+            if periode == "Jour":
+                promoteur = st.sidebar.selectbox("Promoteurs", nom_promo)
+                donnee2 = donnee1[(donnee["Prenom_Nom_Promoteur"] == promoteur)]
+                donne_vente = donnee2[donnee2["Operation"] == "Vente"]
+                if promoteur=="Autre":
+                    donnee_agre = (
+                        donne_vente.groupby(["tata","zone","Precisez","Produit"])
+                        .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
+                        .reset_index()
+                    )
 
-                st.subheader("Ventes de promoteurs")
-                donnee_agre = donnee_agre.rename(
-                    columns={
-                        "tata": "TATA",
-                        "Precisez": "RZ",
-                        "Quantites_Cartons": "Quantités",
-                        "Montant": "Montant A verser",
-                    }
-                )
-                donnee_ordre = donnee_agre.sort_values(by=["TATA","RZ"], ascending=False)
-            else:
+                    st.subheader("Ventes de promoteurs")
+                    donnee_agre = donnee_agre.rename(
+                        columns={
+                            "tata": "TATA",
+                            "Precisez": "RZ",
+                            "Quantites_Cartons": "Quantités",
+                            "Montant": "Montant A verser",
+                        }
+                    )
+                    donnee_ordre = donnee_agre.sort_values(by=["TATA","RZ"], ascending=False)
+                else:
+                    donnee_agre = (
+                        donne_vente.groupby(["tata","zone","Prenom_Nom_Promoteur","Produit"])
+                        .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
+                        .reset_index()
+                    )
+
+                    st.subheader("Ventes de promoteurs")
+                    donnee_agre = donnee_agre.rename(
+                        columns={
+                            "tata": "TATA",
+                            "Prenom_Nom_Promoteur": "Promoteur",
+                            "Quantites_Cartons": "Quantités",
+                            "Montant": "Montant A verser",
+                        }
+                    )
+                    donnee_ordre = donnee_agre.sort_values(by=["TATA","Promoteur"], ascending=False)
+            elif periode == "Semaine":
+                donne_vente = donnee1[donnee1["Operation"] == "Vente"]
                 donnee_agre = (
-                    donne_vente.groupby(["tata","zone","Prenom_Nom_Promoteur","Produit"])
-                    .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
+                    donne_vente.groupby(["tata","Prenom_Nom_Promoteur"])
+                    .agg({"Montant": "sum"})
                     .reset_index()
                 )
 
@@ -394,11 +413,11 @@ elif menu == "SAMBOU":
                     columns={
                         "tata": "TATA",
                         "Prenom_Nom_Promoteur": "Promoteur",
-                        "Quantites_Cartons": "Quantités",
-                        "Montant": "Montant A verser",
+                        "Montant": "CA SEMAINE",
                     }
                 )
-                donnee_ordre = donnee_agre.sort_values(by=["TATA","Promoteur"], ascending=False)
+
+                donnee_ordre = donnee_agre.sort_values(by=["Promoteur"], ascending=False)
         elif choix == "Produit":
             menu_prin=st.sidebar.selectbox("PRODUITS", produit_list)
             donnee2 = donnee1[(donnee["Produit"] == menu_prin)]
@@ -410,14 +429,24 @@ elif menu == "SAMBOU":
             )
 
             st.subheader("Ventes de promoteurs")
-            donnee_agre = donnee_agre.rename(
-                columns={
-                    "tata": "TATA",
-                    "Prenom_Nom_Promoteur": "Promoteur",
-                    "Quantites_Cartons": "Quantités",
-                    "Montant": "Montant A verser",
-                }
-            )
+            if periode == "Semaine":
+                donnee_agre = donnee_agre.rename(
+                    columns={
+                        "tata": "TATA",
+                        "Prenom_Nom_Promoteur": "Promoteur",
+                        "Quantites_Cartons": "Quantités",
+                        "Montant": "CA SEMAINE",
+                    }
+                )
+            elif periode == "Jour":
+                donnee_agre = donnee_agre.rename(
+                    columns={
+                        "tata": "TATA",
+                        "Prenom_Nom_Promoteur": "Promoteur",
+                        "Quantites_Cartons": "Quantités",
+                        "Montant": "Montant A verser",
+                    }
+                )
             donnee_ordre = donnee_agre.sort_values(by=["TATA","Promoteur"], ascending=False)
 
     elif tat_indi == "TATA":
@@ -430,19 +459,29 @@ elif menu == "SAMBOU":
         )
 
         st.subheader("Ventes de promoteurs")
-        donnee_agre = donnee_agre.rename(
-            columns={
-                "tata": "TATA",
-                "Quantites_Cartons": "Quantités",
-                "Montant": "Montant A verser",
-            }
-        )
+        if periode == "Semaine":
+            donnee_agre = donnee_agre.rename(
+                columns={
+                    "tata": "TATA",
+                    "Quantites_Cartons": "Quantités",
+                    "Montant": "CA SEMAINE",
+                }
+            )
+        elif periode == "Jour":
+            donnee_agre = donnee_agre.rename(
+                columns={
+                    "tata": "TATA",
+                    "Quantites_Cartons": "Quantités",
+                    "Montant": "Montant A verser",
+                }
+            )
         donnee_ordre = donnee_agre.sort_values(by=["TATA"], ascending=False)
     #donnee_agre["Date"] = donnee_agre["Date"].dt.strftime("%d/%m/%Y")
-    st.dataframe(donnee_ordre)
+    st.dataframe(donnee_ordre.drop("TATA", axis=1))
     
     colone= st.columns(3)
-    colone[1].metric("💴 CA TATA 1", f"{donnee_ordre[donnee_ordre["TATA"] ==menu_sambou]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
-    #colone[1].metric("💴 CA TATA 2", f"{donnee_ordre[donnee_ordre["TATA"] =="TATA 2"]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
-    #colone[2].metric("💴 CA TATA 3", f"{donnee_ordre[donnee_ordre["TATA"] =="TATA 3"]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
+    if periode== "Semaine":
+        colone[1].metric("💴 CA TATA", f"{donnee_ordre[donnee_ordre["TATA"] ==menu_sambou]["CA SEMAINE"].sum():,.0f}".replace(",", " ")+" XOF")
+    elif periode == "Jour":
+        colone[1].metric("💴 CA TATA", f"{donnee_ordre[donnee_ordre["TATA"] ==menu_sambou]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
 #-----------------------------------------------------------------#
