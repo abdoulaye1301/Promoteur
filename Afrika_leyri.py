@@ -17,9 +17,11 @@ st.logo(profil)
 st.markdown("<h1 style='text-align: center;'>Gestion des Stocks de Produits</h1>", unsafe_allow_html=True)
 # Upload du fichier Excel
 Chargement = pd.read_excel("Donnees_Promoteurs.xlsx", engine='openpyxl')
+donnee_RZ = pd.read_excel("Donnees_RZ.xlsx", engine='openpyxl')
 
 # Définir les chemins des fichiers source et destination
 Chargement["Date"] = Chargement["Date"].dt.date
+donnee_RZ["Date"] = donnee_RZ["Date"].dt.date
 
 # donnee["Mois"] = donnee["Date"].dt.month
 # Définir les bornes du slider
@@ -44,7 +46,7 @@ elif periode == "Semaine":
     donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Numero_semaine"] == semaine)]
 #-----------------------------------------------------------------#
 if menu == "OMAR":
-    sous_menu = st.sidebar.selectbox("", ["Versement","Stock","Stock Départ"])
+    sous_menu = st.sidebar.selectbox("", ["Versement","Stock","Stock Départ","Récapitulatif"])
     if sous_menu == "Versement":
         donnee_agre = (
             donne_vente.groupby(["tata"])
@@ -349,6 +351,63 @@ if menu == "OMAR":
             mime="image/png"
         )
 #-----------------------------------------------------------------#
+#-----------------------------------------------------------------#
+#-----------------------------------------------------------------#
+    elif sous_menu == "Récapitulatif" and periode == "Semaine":
+        st.markdown(f"<h4 style='text-align: center;'>!---------- Récapitulatif des ventes TATA et RZ du semaine {datea} ----------!</h4><br>", unsafe_allow_html=True)
+        #st.subheader("Récapitulatif des ventes")
+        donnee_agre = (
+            donne_vente.groupby(["tata"])
+            .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
+            .reset_index()
+        )
+        donnee_agre = donnee_agre.rename(
+            columns={
+                "Quantites_Cartons": "Quantités",
+                "Montant": "Montant A verser",
+            }
+        )
+        donnee_ordre = donnee_agre.sort_values(by=["tata"], ascending=False)
+        #st.dataframe(donnee_ordre)
+        # ============================= Variables donnees restantes ============================= #
+        donnee_RZ_Livr= donnee_RZ[(donnee_RZ["Operation"] == "Livraison") & (donnee_RZ["Semaine"] == semaine)]
+        CA_donnee_RZ=donnee_RZ_Livr["Prix Total"].sum()
+
+        # TATA 1
+        min_dat = Chargement[Chargement["Numero_semaine"] == semaine]["Date"].dropna().unique()[0]
+        #dat = colone[2].selectbox("", min_date)
+        descente_T1 = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == "TATA 1")]
+        # Regrouper par tata et produit
+        stock_descente_T1 = descente_T1.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+
+        # TATA 2
+        descente_T2 = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == "TATA 2")]
+        # Regrouper par tata et produit
+        stock_descente_T2 = descente_T2.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+
+        # TATA 3
+        descente_T3 = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == "TATA 3")]
+        # Regrouper par tata et produit
+        stock_descente_T3 = descente_T3.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+
+
+        colonnne= st.columns(3)
+        
+        colonnne[0].metric("💴 CA RZ", f"{CA_donnee_RZ:,.2f}".replace(",", " ")+" XOF")
+        colonnne[2].metric("💴 CA RZ + TATA", f"{CA_donnee_RZ+donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+        colonnne[0].metric("💴 CA TATA", f"{donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+        colonnne[2].metric("🚐 Quantité vendue", f"{donnee_ordre["Quantités"].sum():,.2f}".replace(",", " "))
+        ca_restant=descente_T3["Montant"].sum()+descente_T2["Montant"].sum()+descente_T1["Montant"].sum()
+        rest=stock_descente_T1.sum()+stock_descente_T2.sum()+stock_descente_T3.sum()
+        colonnne[0].metric("💴 CA Restant", f"{ca_restant:,.2f}".replace(",", " ")+" XOF")
+        colonnne[2].metric("🅿️ Quantité Restante", f"{rest:,.2f}".replace(",", " "))
+
+
+        
+        colonnne[0].metric("🚐 Transport TATA", f"{statio["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonnne[2].metric("🅿️ Stationnement TATA 1", f"{statio["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+
+    
 #-----------------------------------------------------------------#
 elif menu == "SAMBOU":
     # Filtrer les données selon la plage sélectionnée
