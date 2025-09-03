@@ -399,8 +399,8 @@ if menu == "OMAR":
         colonnne[2].metric("🚐 Quantité vendue", f"{donnee_ordre["Quantités"].sum():,.2f}".replace(",", " "))
         ca_restant=descente_T3["Montant"].sum()+descente_T2["Montant"].sum()+descente_T1["Montant"].sum()
         rest=stock_descente_T1.sum()+stock_descente_T2.sum()+stock_descente_T3.sum()
-        colonnne[0].metric("💴 CA Restant", f"{ca_restant:,.2f}".replace(",", " ")+" XOF")
-        colonnne[2].metric("🅿️ Quantité Restante", f"{rest:,.2f}".replace(",", " "))
+        colonnne[0].metric("💴 **Stock Restant (CA)**", f"{ca_restant:,.2f}".replace(",", " ")+" XOF")
+        colonnne[2].metric("🅿️ **Quantité Restante (STOCK)**", f"{rest:,.2f}".replace(",", " "))
 
 
         
