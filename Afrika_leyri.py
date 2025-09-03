@@ -406,7 +406,9 @@ if menu == "OMAR":
         
         colonnne[0].metric("🚐 Transport TATA", f"{statio["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
         colonnne[2].metric("🅿️ Stationnement TATA 1", f"{statio["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
-
+    
+    elif sous_menu == "Récapitulatif" and periode == "Jour":
+        st.warning("Cette option n'est disponible que pour la vue Semaine.")
     
 #-----------------------------------------------------------------#
 elif menu == "SAMBOU":
