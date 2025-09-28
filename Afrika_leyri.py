@@ -65,29 +65,29 @@ if menu == "OMAR":
         donnee_ordre = donnee_agre.sort_values(by=["tata"], ascending=False)
         #st.dataframe(donnee_ordre)
 
-        colone= st.columns(3)
+        colone= st.columns(2)
         colone[0].metric("💴 CA TATA 1", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 1"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
         colone[1].metric("💴 CA TATA 2", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 2"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
-        colone[2].metric("💴 CA TATA 3", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 3"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+        #colone[2].metric("💴 CA TATA 3", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 3"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
         colone[0].write(" ")
-        colone[2].write(" ")
+        #colone[2].write(" ")
         colone[1].write(" ")
-        colonne= st.columns(3)
+        colonne= st.columns(2)
         colonne[0].metric("🚐 Transport TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[1].metric("🚐 Transport TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[2].metric("🚐 Transport TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        #colonne[2].metric("🚐 Transport TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[0].write(" ")
-        colonne[2].write(" ")
+        #colonne[2].write(" ")
         colonne[1].write(" ")
         colonne[0].metric("🅿️ Stationnement TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[1].metric("🅿️ Stationnement TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[2].metric("🅿️ Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+        #colonne[2].metric("🅿️ Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
     
 
     elif sous_menu == "Stock Départ" and periode == "Semaine":
         st.markdown(f"<h4 style='text-align: center;'>!---------- Stock de départ du {datea} ----------!</h4><br>", unsafe_allow_html=True)
         #st.subheader("!-------------------- Stock de départ --------------------!")
-        prom = colone[4].selectbox("", ["TATA 1", "TATA 2","TATA 3"])
+        prom = colone[4].selectbox("", ["TATA 1", "TATA 2"])
         statio1= statio[(statio["tata"] == prom) & (statio["Operation"] == "Stock Lundi")]
         donnee_agre = (
             statio1.groupby(["tata", "Produit"])
@@ -150,9 +150,9 @@ if menu == "OMAR":
         # Séparer les opérations
         
         if sous_menu=="Stock":
-            prom = colone[3].selectbox("", ["TATA 1", "TATA 2","TATA 3"])
+            prom = colone[3].selectbox("", ["TATA 1", "TATA 2"])
         else:
-           prom = colone[4].selectbox("", ["TATA 1", "TATA 2","TATA 3"]) 
+           prom = colone[4].selectbox("", ["TATA 1", "TATA 2"]) 
 
         if periode == "Jour":
             stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
@@ -375,6 +375,7 @@ if menu == "OMAR":
 
         # TATA 1
         min_dat = Chargement[Chargement["Numero_semaine"] == semaine]["Date"].dropna().unique()[0]
+        
         #dat = colone[2].selectbox("", min_date)
         descente_T1 = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == "TATA 1")]
         # Regrouper par tata et produit
@@ -386,26 +387,28 @@ if menu == "OMAR":
         stock_descente_T2 = descente_T2.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
 
         # TATA 3
-        descente_T3 = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == "TATA 3")]
+        #descente_T3 = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == "TATA 3")]
         # Regrouper par tata et produit
-        stock_descente_T3 = descente_T3.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+        #stock_descente_T3 = descente_T3.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
 
 
-        colonnne= st.columns(3)
+        colonnne= st.columns(2)
         
         colonnne[0].metric("💴 CA RZ", f"{CA_donnee_RZ:,.2f}".replace(",", " ")+" XOF")
-        colonnne[2].metric("💴 CA RZ + TATA", f"{CA_donnee_RZ+donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+        colonnne[1].metric("💴 CA RZ + TATA", f"{CA_donnee_RZ+donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
         colonnne[0].metric("💴 CA TATA", f"{donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
-        colonnne[2].metric("🚐 Quantité vendue", f"{donnee_ordre["Quantités"].sum():,.2f}".replace(",", " "))
-        ca_restant=descente_T3["Montant"].sum()+descente_T2["Montant"].sum()+descente_T1["Montant"].sum()
-        rest=stock_descente_T1.sum()+stock_descente_T2.sum()+stock_descente_T3.sum()
-        colonnne[0].metric("💴 **Stock Restant (CA)**", f"{ca_restant:,.2f}".replace(",", " ")+" XOF")
-        colonnne[2].metric("🅿️ **Quantité Restante (STOCK)**", f"{rest:,.2f}".replace(",", " "))
+        colonnne[1].metric("🔢 Quantité vendue", f"{donnee_ordre["Quantités"].sum():,.2f}".replace(",", " "))
+        ca_restant=descente_T2["Montant"].sum()+descente_T1["Montant"].sum() #+descente_T3["Montant"].sum()
+        rest=stock_descente_T1.sum()+stock_descente_T2.sum()# +stock_descente_T3.sum()
 
+
+        colonnne[0].metric("🚐 Transport TATA", f"{statio["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonnne[1].metric("🅿️ Stationnement", f"{statio["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+
+        colonnne[0].metric("🏠 **Stock Restant (CA)**", f"{ca_restant:,.2f}".replace(",", " ")+" XOF")
+        colonnne[1].metric("🏠 **Quantité Restante (STOCK)**", f"{rest:,.2f}".replace(",", " "))
 
         
-        colonnne[0].metric("🚐 Transport TATA", f"{statio["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonnne[2].metric("🅿️ Stationnement TATA 1", f"{statio["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
     
     elif sous_menu == "Récapitulatif" and periode == "Jour":
         st.warning("Cette option n'est disponible que pour la vue Semaine.")
@@ -415,7 +418,7 @@ elif menu == "SAMBOU":
     # Filtrer les données selon la plage sélectionnée
     donnee = donne_vente
     # Afficher les résultats
-    menu_sambou = st.sidebar.selectbox("TATAS", ["TATA 1", "TATA 2","TATA 3"])
+    menu_sambou = st.sidebar.selectbox("TATAS", ["TATA 1", "TATA 2"])
     donnee1 = donnee[(donnee["tata"] == menu_sambou)]
     nom_promo=donnee1["Prenom_Nom_Promoteur"].dropna().unique().tolist()
     produit_list=donnee1[donnee1["Operation"] == "Vente"]["Produit"].dropna().unique().tolist()
