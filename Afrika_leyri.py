@@ -30,7 +30,7 @@ num_semaine = Chargement["Numero_semaine"].unique()
 
 colone= st.columns(5)
 # Choix de l’onglet
-menu = st.sidebar.radio("Navigation", ["OMAR","SAMBOU"])
+menu = st.sidebar.radio("Navigation", ["AGREGATION","DETAIL"])
 periode = colone[0].selectbox("", ["Jour","Semaine"])
 if periode == "Jour":
     semaine = colone[2].selectbox("", num_semaine)
@@ -45,7 +45,7 @@ elif periode == "Semaine":
     datea = semaine
     donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Numero_semaine"] == semaine)]
 #-----------------------------------------------------------------#
-if menu == "OMAR":
+if menu == "AGREGATION":
     sous_menu = st.sidebar.selectbox("", ["Versement","Stock","Stock Départ","Récapitulatif"])
     if sous_menu == "Versement":
         donnee_agre = (
@@ -414,7 +414,7 @@ if menu == "OMAR":
         st.warning("Cette option n'est disponible que pour la vue Semaine.")
     
 #-----------------------------------------------------------------#
-elif menu == "SAMBOU":
+elif menu == "DETAIL":
     # Filtrer les données selon la plage sélectionnée
     donnee = donne_vente
     # Afficher les résultats
