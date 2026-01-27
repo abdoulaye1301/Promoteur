@@ -150,9 +150,9 @@ if menu == "AGREGATION":
         # Séparer les opérations
         
         if sous_menu=="Stock":
-            prom = colone[3].selectbox("", ["TATA 1", "TATA 2", "TATA 3"])
+            prom = colone[3].selectbox("", ["TATA 1", "TATA 3"])
         else:
-           prom = colone[4].selectbox("", ["TATA 1", "TATA 2", "TATA 3"])
+           prom = colone[4].selectbox("", ["TATA 1", "TATA 3"]) 
 
         if periode == "Jour":
             stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
@@ -418,7 +418,7 @@ elif menu == "DETAIL":
     # Filtrer les données selon la plage sélectionnée
     donnee = donne_vente
     # Afficher les résultats
-    menu_sambou = st.sidebar.selectbox("TATAS", ["TATA 1", "TATA 2"])
+    menu_sambou = st.sidebar.selectbox("TATAS", ["TATA 1", "TATA 3"])
     donnee1 = donnee[(donnee["tata"] == menu_sambou)]
     nom_promo=donnee1["Prenom_Nom_Promoteur"].dropna().unique().tolist()
     produit_list=donnee1[donnee1["Operation"] == "Vente"]["Produit"].dropna().unique().tolist()
