@@ -65,29 +65,32 @@ if menu == "AGREGATION":
         donnee_ordre = donnee_agre.sort_values(by=["tata"], ascending=False)
         #st.dataframe(donnee_ordre)
 
-        colone= st.columns(2)
+        colone= st.columns(3)
         colone[0].metric("💴 CA TATA 1", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 1"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
-        #colone[1].metric("💴 CA TATA 2", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 2"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
-        colone[1].metric("💴 CA TATA 3", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 3"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+        colone[1].metric("💴 CA TATA 2", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 2"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+        colone[2].metric("💴 CA TATA 3", f"{donnee_ordre[donnee_ordre["tata"] =="TATA 3"]["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
         colone[0].write(" ")
         #colone[2].write(" ")
         colone[1].write(" ")
-        colonne= st.columns(2)
+        colonne= st.columns(3)
         colonne[0].metric("🚐 Transport TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
-        #colonne[1].metric("🚐 Transport TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[1].metric("🚐 Transport TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[1].metric("🚐 Transport TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[2].metric("🚐 Transport TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
         colonne[0].write(" ")
         #colonne[2].write(" ")
         colonne[1].write(" ")
         colonne[0].metric("🅿️ Stationnement TATA 1", f"{statio[statio["tata"] =="TATA 1"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
-        #colonne[1].metric("🅿️ Stationnement TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
-        colonne[1].metric("🅿️ Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[1].metric("🅿️ Stationnement TATA 2", f"{statio[statio["tata"] =="TATA 2"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+        colonne[2].metric("🅿️ Stationnement TATA 3", f"{statio[statio["tata"] =="TATA 3"]["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
     
 
     elif sous_menu == "Stock Départ" and periode == "Semaine":
         st.markdown(f"<h4 style='text-align: center;'>!---------- Stock de départ du {datea} ----------!</h4><br>", unsafe_allow_html=True)
+        
         #st.subheader("!-------------------- Stock de départ --------------------!")
-        prom = colone[4].selectbox("", ["TATA 1", "TATA 2","TATA 3"])
+        
+        prom = colone[4].selectbox("", ["TATA 1","TATA 3"])
+        
         statio1= statio[(statio["tata"] == prom) & (statio["Operation"] == "Stock Lundi")]
         donnee_agre = (
             statio1.groupby(["tata", "Produit"])
