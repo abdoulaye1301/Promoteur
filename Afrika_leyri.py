@@ -89,7 +89,7 @@ if menu == "AGREGATION":
         
         #st.subheader("!-------------------- Stock de départ --------------------!")
         
-        prom = colone[4].selectbox("", ["TATA 1","TATA 3"])
+        prom = colone[4].selectbox("", ["TATA 1","TATA 2","TATA 3"])
         
         statio1= statio[(statio["tata"] == prom) & (statio["Operation"] == "Stock Lundi")]
         donnee_agre = (
@@ -153,9 +153,9 @@ if menu == "AGREGATION":
         # Séparer les opérations
         
         if sous_menu=="Stock":
-            prom = colone[3].selectbox("", ["TATA 1", "TATA 3"])
+            prom = colone[3].selectbox("", ["TATA 1", "TATA 2", "TATA 3"])
         else:
-           prom = colone[4].selectbox("", ["TATA 1", "TATA 3"]) 
+           prom = colone[4].selectbox("", ["TATA 1", "TATA 2", "TATA 3"]) 
 
         if periode == "Jour":
             stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
