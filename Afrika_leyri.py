@@ -390,9 +390,9 @@ if menu == "AGREGATION":
         stock_descente_T2 = descente_T2.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
 
         # TATA 3
-        #descente_T3 = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == "TATA 3")]
+        descente_T3 = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == "TATA 3")]
         # Regrouper par tata et produit
-        #stock_descente_T3 = descente_T3.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+        stock_descente_T3 = descente_T3.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
 
 
         colonnne= st.columns(2)
@@ -402,7 +402,7 @@ if menu == "AGREGATION":
         colonnne[0].metric("💴 CA TATA", f"{donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
         colonnne[1].metric("🔢 Quantité vendue", f"{donnee_ordre["Quantités"].sum():,.2f}".replace(",", " "))
         ca_restant=descente_T2["Montant"].sum()+descente_T1["Montant"].sum() #+descente_T3["Montant"].sum()
-        rest=stock_descente_T1.sum()+stock_descente_T2.sum()# +stock_descente_T3.sum()
+        rest=stock_descente_T1.sum()+stock_descente_T2.sum()+stock_descente_T3.sum()
 
 
         colonnne[0].metric("🚐 Transport TATA", f"{statio["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
