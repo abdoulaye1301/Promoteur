@@ -421,7 +421,7 @@ elif menu == "DETAIL":
     # Filtrer les données selon la plage sélectionnée
     donnee = donne_vente
     # Afficher les résultats
-    menu_sambou = st.sidebar.selectbox("TATAS", ["TATA 1","TATA 2" "TATA 3"])
+    menu_sambou = st.sidebar.selectbox("TATAS", ["TATA 1","TATA 2", "TATA 3"])
     donnee1 = donnee[(donnee["tata"] == menu_sambou)]
     nom_promo=donnee1["Prenom_Nom_Promoteur"].dropna().unique().tolist()
     produit_list=donnee1[donnee1["Operation"] == "Vente"]["Produit"].dropna().unique().tolist()
