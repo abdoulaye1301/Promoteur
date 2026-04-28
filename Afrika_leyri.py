@@ -554,28 +554,7 @@ elif menu == "DETAIL":
 #-----------------------------------------------------------------#
 # Dans votre onglet VALERIE
 elif menu == "VALERIE":
-    import base64
-    from weasyprint import HTML
-    # --- Fonction utilitaire pour encoder l'image en base64 (pour le PDF) ---
-    def get_image_base64(path):
-        try:
-            with open(path, "rb") as image_file:
-                return base64.b64encode(image_file.read()).decode()
-        except:
-            return ""
-        
-    # Fonction de formatage avec espace pour les milliers
-    def format_mille(valeur):
-        return "{:,.0f}".format(valeur).replace(",", " ")
-    
 
-    # --- Fonction pour afficher le PDF dans Streamlit ---
-    def display_pdf(pdf_bytes):
-        # Encodage en base64 pour l'affichage iframe
-        base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
-        # Création du code HTML pour l'iframe
-        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="600" type="application/pdf"></iframe>'
-        st.markdown(pdf_display, unsafe_allow_html=True)
 
     if periode == "Semaine":
         prom = colone[4].selectbox("", ["TATA 1","TATA 2","TATA 3"])
@@ -583,8 +562,8 @@ elif menu == "VALERIE":
         password = st.sidebar.text_input("Code d'accès requis", type="password")
         
         # Récupération sécurisée du secret
-        SECRET_PASSWORD = st.secrets["credentials"]["valerie"]
-        #SECRET_PASSWORD = "1234" #SECRET_PASSWORD.strip()  # Supprimer les espaces éventuels
+        #SECRET_PASSWORD = st.secrets["credentials"]["valerie"]
+        SECRET_PASSWORD = "1234" #SECRET_PASSWORD.strip()  # Supprimer les espaces éventuels
 
         if password == SECRET_PASSWORD:
             st.success("Accès autorisé")
@@ -605,6 +584,30 @@ elif menu == "VALERIE":
 
             #total_jours = suivi_assiduite['Jours Travaillés'].sum()
             total_montant = suivi_assiduite['MONTANT PAYE'].sum()
+            import base64
+            import os
+            os.environ["WEASYPRINT_DLL_DIRECTORIES"] = "/usr/lib/x86_64-linux-gnu"
+            from weasyprint import HTML
+            # --- Fonction utilitaire pour encoder l'image en base64 (pour le PDF) ---
+            def get_image_base64(path):
+                try:
+                    with open(path, "rb") as image_file:
+                        return base64.b64encode(image_file.read()).decode()
+                except:
+                    return ""
+                
+            # Fonction de formatage avec espace pour les milliers
+            def format_mille(valeur):
+                return "{:,.0f}".format(valeur).replace(",", " ")
+
+
+            # --- Fonction pour afficher le PDF dans Streamlit ---
+            def display_pdf(pdf_bytes):
+                # Encodage en base64 pour l'affichage iframe
+                base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
+                # Création du code HTML pour l'iframe
+                pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="600" type="application/pdf"></iframe>'
+                st.markdown(pdf_display, unsafe_allow_html=True)
 
             # 2. Construction du HTML pour le PDF (Modèle exact du PDF téléchargé)
             logo_b64 = get_image_base64("Logo Afrika Leyri.png")
@@ -728,6 +731,14 @@ elif menu == "VALERIE":
                 file_name=f"Fiche_Paie_{prom}_S{semaine}.pdf",
                 mime="application/pdf"
             )
+
+
+
+
+
+
+
+
 
 
         elif password != "":
