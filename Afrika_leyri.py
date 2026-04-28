@@ -562,6 +562,24 @@ elif menu == "VALERIE":
 
     if password == SECRET_PASSWORD:
         st.success("Accès autorisé")
-        # ... reste du code ...
+        
+        # Calcul du nombre de jours travaillés
+        # On groupe par Tata et Promoteur, puis on compte les dates uniques
+        suivi_agents = Chargement.groupby(['tata', 'Prenom_Nom_Promoteur'])['Date'].nunique().reset_index()
+        suivi_agents = suivi_agents.rename(columns={
+            'Date': 'Jours travaillés',
+            'Prenom_Nom_Promoteur': 'Agent'
+        })
+        
+        # Filtre optionnel par TATA pour plus de clarté
+        tata_filter = st.selectbox("Filtrer par TATA", ["Tous"] + Chargement['tata'].unique().tolist())
+        
+        if tata_filter != "Tous":
+            suivi_agents = suivi_agents[suivi_agents['tata'] == tata_filter]
+        
+        st.subheader("Récapitulatif de présence")
+        st.dataframe(suivi_agents.sort_values(by='Jours travaillés', ascending=False), use_container_width=True)
+
+
     elif password != "":
         st.error("Mot de passe incorrect.")
