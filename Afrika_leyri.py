@@ -583,8 +583,8 @@ elif menu == "VALERIE":
         password = st.sidebar.text_input("Code d'accès requis", type="password")
         
         # Récupération sécurisée du secret
-        #SECRET_PASSWORD = st.secrets["credentials"]["valerie"]
-        SECRET_PASSWORD = "1234" #SECRET_PASSWORD.strip()  # Supprimer les espaces éventuels
+        SECRET_PASSWORD = st.secrets["credentials"]["valerie"]
+        #SECRET_PASSWORD = "1234" #SECRET_PASSWORD.strip()  # Supprimer les espaces éventuels
 
         if password == SECRET_PASSWORD:
             st.success("Accès autorisé")
