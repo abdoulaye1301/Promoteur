@@ -562,24 +562,27 @@ elif menu == "VALERIE":
 
     if password == SECRET_PASSWORD:
         st.success("Accès autorisé")
-        
-        # Calcul du nombre de jours travaillés
-        # On groupe par Tata et Promoteur, puis on compte les dates uniques
-        suivi_agents = Chargement.groupby(['tata', 'Prenom_Nom_Promoteur'])['Date'].nunique().reset_index()
-        suivi_agents = suivi_agents.rename(columns={
-            'Date': 'Jours travaillés',
-            'Prenom_Nom_Promoteur': 'Agent'
-        })
-        
-        # Filtre optionnel par TATA pour plus de clarté
-        tata_filter = st.selectbox("Filtrer par TATA", ["Tous"] + Chargement['tata'].unique().tolist())
-        
-        if tata_filter != "Tous":
-            suivi_agents = suivi_agents[suivi_agents['tata'] == tata_filter]
-        
-        st.subheader("Récapitulatif de présence")
-        st.dataframe(suivi_agents.sort_values(by='Jours travaillés', ascending=False), use_container_width=True)
+        st.markdown("---")
+        st.subheader("📊 Suivi de l'Assiduité des Agents")
 
+        # 1. Filtrer les données pour la semaine sélectionnée
+        # On utilise 'donne_vente' (ou 'Chargement') filtré par semaine
+        data_semaine = Chargement[Chargement["Numero_semaine"] == semaine]
+
+        # 2. Calculer le nombre de jours uniques travaillés par agent et par tata
+        # On suppose que si un agent est présent dans les données pour une date, il a travaillé
+        suivi_assiduite = data_semaine.groupby(['tata', 'Prenom_Nom_Promoteur'])['Date'].nunique().reset_index()
+        suivi_assiduite.rename(columns={'Date': 'Jours Travaillés', 'Prenom_Nom_Promoteur': 'Agent'}, inplace=True)
+        
+        # 3. Affichage
+        # Optionnel : Afficher sous forme de tableau interactif
+        st.dataframe(suivi_assiduite, use_container_width=True)
+
+        # Optionnel : Affichage sous forme de pivot pour une meilleure lecture (Matrice)
+        st.write("---")
+        st.subheader("Vue synthétique (Tableau croisé)")
+        pivot_assiduite = suivi_assiduite.pivot(index='Agent', columns='tata', values='Jours Travaillés').fillna(0)
+        st.table(pivot_assiduite)
 
     elif password != "":
         st.error("Mot de passe incorrect.")
