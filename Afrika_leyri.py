@@ -30,7 +30,7 @@ num_semaine = Chargement["Numero_semaine"].unique()
 
 colone= st.columns(5)
 # Choix de l’onglet
-menu = st.sidebar.radio("Navigation", ["AGREGATION","DETAIL"])
+menu = st.sidebar.radio("Navigation", ["AGREGATION","DETAIL","VALERIE"])
 periode = colone[0].selectbox("", ["Jour","Semaine"])
 if periode == "Jour":
     semaine = colone[2].selectbox("", num_semaine)
@@ -552,3 +552,16 @@ elif menu == "DETAIL":
     elif periode == "Jour":
         colone[1].metric("💴 CA TATA", f"{donnee_ordre[donnee_ordre["TATA"] ==menu_sambou]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
 #-----------------------------------------------------------------#
+# Dans votre onglet VALERIE
+elif menu == "VALERIE":
+    st.sidebar.markdown("---")
+    password = st.sidebar.text_input("Code d'accès requis", type="password")
+    
+    # Récupération sécurisée du secret
+    SECRET_PASSWORD = st.secrets["credentials"]["valerie"]
+
+    if password == SECRET_PASSWORD:
+        st.success("Accès autorisé")
+        # ... reste du code ...
+    elif password != "":
+        st.error("Mot de passe incorrect.")
