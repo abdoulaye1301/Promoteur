@@ -9,3 +9,9 @@ mdurl==0.1.2
 pygments==2.19.2
 rich==14.0.0
 weasyprint
+libglib2.0-0
+libpango-1.0-0
+libpangocairo-1.0-0
+libcairo2
+libffi-dev
+shared-mime-info
