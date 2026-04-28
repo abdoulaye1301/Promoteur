@@ -14,7 +14,7 @@ st.set_page_config(
 profil = Image.open("Logo Afrika Leyri.png")
 st.logo(profil)
 
-st.markdown("<h1 style='text-align: center;'>Gestion des Stocks de Produits</h1>", unsafe_allow_html=True)
+#st.markdown("<h1 style='text-align: center;'>Gestion des Stocks de Produits</h1>", unsafe_allow_html=True)
 # Upload du fichier Excel
 Chargement = pd.read_excel("Donnees_Promoteurs.xlsx", engine='openpyxl')
 donnee_RZ = pd.read_excel("Donnees_RZ.xlsx", engine='openpyxl')
@@ -40,7 +40,7 @@ if periode == "Jour":
     statio = Chargement[(Chargement["Date"] == dat)]
     donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Date"] == dat)]
 elif periode == "Semaine":
-    semaine = colone[2].selectbox("Sélectionnez une semaine", num_semaine)
+    semaine = colone[2].selectbox("", num_semaine)
     statio = Chargement[(Chargement["Numero_semaine"] == semaine)]
     datea = semaine
     donne_vente = Chargement[(Chargement["Operation"] == "Vente") & (Chargement["Numero_semaine"] == semaine)]
@@ -554,35 +554,183 @@ elif menu == "DETAIL":
 #-----------------------------------------------------------------#
 # Dans votre onglet VALERIE
 elif menu == "VALERIE":
-    st.sidebar.markdown("---")
-    password = st.sidebar.text_input("Code d'accès requis", type="password")
-    
-    # Récupération sécurisée du secret
-    SECRET_PASSWORD = st.secrets["credentials"]["valerie"]
-
-    if password == SECRET_PASSWORD:
-        st.success("Accès autorisé")
-        st.markdown("---")
-        st.subheader("📊 Suivi de l'Assiduité des Agents")
-
-        # 1. Filtrer les données pour la semaine sélectionnée
-        # On utilise 'donne_vente' (ou 'Chargement') filtré par semaine
-        data_semaine = Chargement[Chargement["Numero_semaine"] == semaine]
-
-        # 2. Calculer le nombre de jours uniques travaillés par agent et par tata
-        # On suppose que si un agent est présent dans les données pour une date, il a travaillé
-        suivi_assiduite = data_semaine.groupby(['tata', 'Prenom_Nom_Promoteur'])['Date'].nunique().reset_index()
-        suivi_assiduite.rename(columns={'Date': 'Jours Travaillés', 'Prenom_Nom_Promoteur': 'Agent'}, inplace=True)
+    import base64
+    from weasyprint import HTML
+    # --- Fonction utilitaire pour encoder l'image en base64 (pour le PDF) ---
+    def get_image_base64(path):
+        try:
+            with open(path, "rb") as image_file:
+                return base64.b64encode(image_file.read()).decode()
+        except:
+            return ""
         
-        # 3. Affichage
-        # Optionnel : Afficher sous forme de tableau interactif
-        st.dataframe(suivi_assiduite, use_container_width=True)
+    # Fonction de formatage avec espace pour les milliers
+    def format_mille(valeur):
+        return "{:,.0f}".format(valeur).replace(",", " ")
+    
 
-        # Optionnel : Affichage sous forme de pivot pour une meilleure lecture (Matrice)
-        st.write("---")
-        st.subheader("Vue synthétique (Tableau croisé)")
-        pivot_assiduite = suivi_assiduite.pivot(index='Agent', columns='tata', values='Jours Travaillés').fillna(0)
-        st.table(pivot_assiduite)
+    # --- Fonction pour afficher le PDF dans Streamlit ---
+    def display_pdf(pdf_bytes):
+        # Encodage en base64 pour l'affichage iframe
+        base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
+        # Création du code HTML pour l'iframe
+        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="600" type="application/pdf"></iframe>'
+        st.markdown(pdf_display, unsafe_allow_html=True)
 
-    elif password != "":
-        st.error("Mot de passe incorrect.")
+    if periode == "Semaine":
+        prom = colone[4].selectbox("", ["TATA 1","TATA 2","TATA 3"])
+        st.sidebar.markdown("---")
+        password = st.sidebar.text_input("Code d'accès requis", type="password")
+        
+        # Récupération sécurisée du secret
+        #SECRET_PASSWORD = st.secrets["credentials"]["valerie"]
+        SECRET_PASSWORD = "1234" #SECRET_PASSWORD.strip()  # Supprimer les espaces éventuels
+
+        if password == SECRET_PASSWORD:
+            st.success("Accès autorisé")
+            st.markdown("---")
+            st.markdown(f"<br><h4 style='text-align: center;'>FICHE DE PAIE {prom} DE LA SEMAINE {semaine}</h4>", unsafe_allow_html=True)
+            #st.subheader("📊 Suivi de l'Assiduité des Agents")
+
+            # 1. Filtrer les données pour la semaine sélectionnée
+            # On utilise 'donne_vente' (ou 'Chargement') filtré par semaine
+            data_semaine = Chargement[(Chargement["Numero_semaine"] == semaine) & (Chargement["Prenom_Nom_Promoteur"] != "Autre") & (Chargement["Prenom_Nom_Promoteur"].notna()) & (Chargement['tata'] == prom)]
+
+            # 2. Calculer le nombre de jours uniques travaillés par agent et par tata
+            # On suppose que si un agent est présent dans les données pour une date, il a travaillé
+            suivi_assiduite = data_semaine.groupby(['Prenom_Nom_Promoteur'])['Date'].nunique().reset_index()
+            suivi_assiduite.rename(columns={'Date': 'JOURS TRAVAILLES', 'Prenom_Nom_Promoteur': 'PRENOM & NOM'}, inplace=True)
+            # Ajouter la colonne Montant (Jours * 4000)
+            suivi_assiduite['MONTANT PAYE'] = suivi_assiduite['JOURS TRAVAILLES'] * 4000
+
+            #total_jours = suivi_assiduite['Jours Travaillés'].sum()
+            total_montant = suivi_assiduite['MONTANT PAYE'].sum()
+
+            # 2. Construction du HTML pour le PDF (Modèle exact du PDF téléchargé)
+            logo_b64 = get_image_base64("Logo Afrika Leyri.png")
+            
+            # Dates dynamiques (à adapter selon votre colonne Date si disponible)
+            titre_periode = f"PAIE SALAIRES FIXES SEMAINE {semaine}" 
+
+            # --- Mise à jour du template HTML pour le PDF ---
+
+            html_template = f"""
+            <html>
+            <head>
+                <style>
+                    @page {{ 
+                        size: A4; 
+                        margin: 15mm; 
+                    }}
+                    body {{ 
+                        font-family: 'Helvetica', Arial, sans-serif; 
+                        color: #000; 
+                    }}
+                    
+                    /* Structure de l'en-tête pour aligner Logo (Gauche) et Nom (Droite) */
+                    .header-table {{ 
+                        width: 100%; 
+                        border-bottom: 2px solid #000; 
+                        padding-bottom: 10px; 
+                        margin-bottom: 20px; 
+                    }}
+                    .logo-cell {{ 
+                        text-align: left; 
+                        vertical-align: middle; 
+                    }}
+                    .company-cell {{ 
+                        text-align: right; 
+                        vertical-align: middle; 
+                        font-size: 18pt; 
+                        font-weight: bold; 
+                        letter-spacing: 1px;
+                    }}
+                    
+                    .main-title {{ 
+                        text-align: center; 
+                        font-size: 12pt; 
+                        font-weight: bold; 
+                        margin: 25px 0; 
+                        text-transform: uppercase; 
+                        line-height: 1.4; 
+                    }}
+                    
+                    table.data {{ 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                    }}
+                    th {{ 
+                        border: 1px solid #000; 
+                        padding: 10px; 
+                        background-color: #f2f2f2; 
+                        font-size: 9pt; 
+                        text-transform: uppercase;
+                    }}
+                    td {{ 
+                        border: 1px solid #000; 
+                        padding: 8px; 
+                        text-align: center; 
+                        font-size: 10pt; 
+                    }}
+                    .total-row {{ 
+                        font-weight: bold; 
+                        background-color: #eee; 
+                    }}
+                </style>
+            </head>
+            <body>
+                <table class="header-table">
+                    <tr>
+                        <td class="logo-cell">
+                            <img src="data:image/png;base64,{logo_b64}" style="width: 140px;">
+                        </td>
+                        <td class="company-cell">
+                            {prom}
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="main-title">
+                    ACTIVATION KAMLAC PAIE SALAIRES FIXES DE LA SEMAINE {semaine})
+                </div>
+
+                <table class="data">
+                    <thead>
+                        <tr>
+                            <th>PRENOM & NOM</th>
+                            <th>JOURS TRAVAILLES</th>
+                            <th>MONTANT PAYE</th>
+                            <th>SIGNATURE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {"".join([f"<tr><td style='text-align: left;'>{r['PRENOM & NOM']}</td><td>{r['JOURS TRAVAILLES']}</td><td>{format_mille(r['MONTANT PAYE'])}</td><td></td></tr>" for _, r in suivi_assiduite.iterrows()])}
+                        <tr class="total-row">
+                            <td colspan="2">TOTAL</td>
+                            <td>{format_mille(total_montant)}</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </body>
+            </html>
+            """
+
+            pdf_bytes = HTML(string=html_template).write_pdf()
+            # 2. Zone de prévisualisation
+            st.subheader("Aperçu de la fiche de paie")
+            display_pdf(pdf_bytes)
+            
+            st.write("---")
+            st.download_button(
+                label="📥 Télécharger la Fiche de Paie PDF",
+                data=pdf_bytes,
+                file_name=f"Fiche_Paie_{prom}_S{semaine}.pdf",
+                mime="application/pdf"
+            )
+
+
+        elif password != "":
+            st.error("Mot de passe incorrect.")
+    elif periode == "Jour":
+        st.warning("Cette option n'est disponible que pour la vue Semaine.")
