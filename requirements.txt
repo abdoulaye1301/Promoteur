@@ -1,11 +1,5 @@
 streamlit
 pandas
 matplotlib
-seaborn
-plotly
 openpyxl
-markdown-it-py
-mdurl
-pygments
-rich
 xhtml2pdf
