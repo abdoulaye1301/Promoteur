@@ -608,7 +608,7 @@ elif menu == "VALERIE":
                 # Création du code HTML pour l'iframe
                 pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="600" type="application/pdf"></iframe>'
                 st.markdown(pdf_display, unsafe_allow_html=True)
-
+    
             # 2. Construction du HTML pour le PDF (Modèle exact du PDF téléchargé)
             logo_b64 = get_image_base64("Logo Afrika Leyri.png")
             
