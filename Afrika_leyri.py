@@ -555,191 +555,118 @@ elif menu == "DETAIL":
 # Dans votre onglet VALERIE
 elif menu == "VALERIE":
 
-
     if periode == "Semaine":
         prom = colone[4].selectbox("", ["TATA 1","TATA 2","TATA 3"])
         st.sidebar.markdown("---")
         password = st.sidebar.text_input("Code d'accès requis", type="password")
-        
-        # Récupération sécurisée du secret
-        #SECRET_PASSWORD = st.secrets["credentials"]["valerie"]
-        SECRET_PASSWORD = "1234" #SECRET_PASSWORD.strip()  # Supprimer les espaces éventuels
+
+        SECRET_PASSWORD = "1234"
 
         if password == SECRET_PASSWORD:
             st.success("Accès autorisé")
-            st.markdown("---")
-            st.markdown(f"<br><h4 style='text-align: center;'>FICHE DE PAIE {prom} DE LA SEMAINE {semaine}</h4>", unsafe_allow_html=True)
-            #st.subheader("📊 Suivi de l'Assiduité des Agents")
 
-            # 1. Filtrer les données pour la semaine sélectionnée
-            # On utilise 'donne_vente' (ou 'Chargement') filtré par semaine
-            data_semaine = Chargement[(Chargement["Numero_semaine"] == semaine) & (Chargement["Prenom_Nom_Promoteur"] != "Autre") & (Chargement["Prenom_Nom_Promoteur"].notna()) & (Chargement['tata'] == prom)]
+            st.markdown(f"""
+                <h4 style='text-align: center;'>
+                FICHE DE PAIE {prom} - SEMAINE {semaine}
+                </h4>
+            """, unsafe_allow_html=True)
 
-            # 2. Calculer le nombre de jours uniques travaillés par agent et par tata
-            # On suppose que si un agent est présent dans les données pour une date, il a travaillé
-            suivi_assiduite = data_semaine.groupby(['Prenom_Nom_Promoteur'])['Date'].nunique().reset_index()
-            suivi_assiduite.rename(columns={'Date': 'JOURS TRAVAILLES', 'Prenom_Nom_Promoteur': 'PRENOM & NOM'}, inplace=True)
-            # Ajouter la colonne Montant (Jours * 4000)
-            suivi_assiduite['MONTANT PAYE'] = suivi_assiduite['JOURS TRAVAILLES'] * 4000
+            # =========================
+            # 🔹 CREATION DE "suivi"
+            # =========================
+            data_semaine = Chargement[
+                (Chargement["Numero_semaine"] == semaine) &
+                (Chargement["Prenom_Nom_Promoteur"] != "Autre") &
+                (Chargement["Prenom_Nom_Promoteur"].notna()) &
+                (Chargement['tata'] == prom)
+            ]
 
-            #total_jours = suivi_assiduite['Jours Travaillés'].sum()
-            total_montant = suivi_assiduite['MONTANT PAYE'].sum()
-            import base64
-            from weasyprint import HTML
-            # --- Fonction utilitaire pour encoder l'image en base64 (pour le PDF) ---
-            def get_image_base64(path):
-                try:
-                    with open(path, "rb") as image_file:
-                        return base64.b64encode(image_file.read()).decode()
-                except:
-                    return ""
-                
-            # Fonction de formatage avec espace pour les milliers
-            def format_mille(valeur):
-                return "{:,.0f}".format(valeur).replace(",", " ")
+            suivi = data_semaine.groupby(
+                ['Prenom_Nom_Promoteur']
+            )['Date'].nunique().reset_index()
 
+            suivi.rename(columns={
+                'Prenom_Nom_Promoteur': 'Nom',
+                'Date': 'Jours travaillés'
+            }, inplace=True)
 
-            # --- Fonction pour afficher le PDF dans Streamlit ---
-            def display_pdf(pdf_bytes):
-                # Encodage en base64 pour l'affichage iframe
-                base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
-                # Création du code HTML pour l'iframe
-                pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="600" type="application/pdf"></iframe>'
-                st.markdown(pdf_display, unsafe_allow_html=True)
+            suivi['Salaire'] = suivi['Jours travaillés'] * 4000
 
-            # 2. Construction du HTML pour le PDF (Modèle exact du PDF téléchargé)
-            logo_b64 = get_image_base64("Logo Afrika Leyri.png")
-            
-            # Dates dynamiques (à adapter selon votre colonne Date si disponible)
-            titre_periode = f"PAIE SALAIRES FIXES SEMAINE {semaine}" 
+            total = suivi['Salaire'].sum()
 
-            # --- Mise à jour du template HTML pour le PDF ---
+            # =========================
+            # AFFICHAGE
+            # =========================
+            st.dataframe(suivi)
+            st.metric("💰 Total à payer", f"{total:,.0f} XOF".replace(",", " "))
 
-            html_template = f"""
-            <html>
-            <head>
-                <style>
-                    @page {{ 
-                        size: A4; 
-                        margin: 15mm; 
-                    }}
-                    body {{ 
-                        font-family: 'Helvetica', Arial, sans-serif; 
-                        color: #000; 
-                    }}
-                    
-                    /* Structure de l'en-tête pour aligner Logo (Gauche) et Nom (Droite) */
-                    .header-table {{ 
-                        width: 100%; 
-                        border-bottom: 2px solid #000; 
-                        padding-bottom: 10px; 
-                        margin-bottom: 20px; 
-                    }}
-                    .logo-cell {{ 
-                        text-align: left; 
-                        vertical-align: middle; 
-                    }}
-                    .company-cell {{ 
-                        text-align: right; 
-                        vertical-align: middle; 
-                        font-size: 18pt; 
-                        font-weight: bold; 
-                        letter-spacing: 1px;
-                    }}
-                    
-                    .main-title {{ 
-                        text-align: center; 
-                        font-size: 12pt; 
-                        font-weight: bold; 
-                        margin: 25px 0; 
-                        text-transform: uppercase; 
-                        line-height: 1.4; 
-                    }}
-                    
-                    table.data {{ 
-                        width: 100%; 
-                        border-collapse: collapse; 
-                    }}
-                    th {{ 
-                        border: 1px solid #000; 
-                        padding: 10px; 
-                        background-color: #f2f2f2; 
-                        font-size: 9pt; 
-                        text-transform: uppercase;
-                    }}
-                    td {{ 
-                        border: 1px solid #000; 
-                        padding: 8px; 
-                        text-align: center; 
-                        font-size: 10pt; 
-                    }}
-                    .total-row {{ 
-                        font-weight: bold; 
-                        background-color: #eee; 
-                    }}
-                </style>
-            </head>
-            <body>
-                <table class="header-table">
-                    <tr>
-                        <td class="logo-cell">
-                            <img src="data:image/png;base64,{logo_b64}" style="width: 140px;">
-                        </td>
-                        <td class="company-cell">
-                            {prom}
-                        </td>
-                    </tr>
-                </table>
+            # =========================
+            # 🔹 GENERATION PDF
+            # =========================
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+            from reportlab.lib import colors
+            from reportlab.lib.pagesizes import A4
+            from reportlab.lib.styles import getSampleStyleSheet
+            from io import BytesIO
 
-                <div class="main-title">
-                    ACTIVATION KAMLAC PAIE SALAIRES FIXES DE LA SEMAINE {semaine})
-                </div>
+            def generate_pdf_paie(df, prom, semaine, total):
+                buffer = BytesIO()
+                doc = SimpleDocTemplate(buffer, pagesize=A4)
+                elements = []
+                styles = getSampleStyleSheet()
 
-                <table class="data">
-                    <thead>
-                        <tr>
-                            <th>PRENOM & NOM</th>
-                            <th>JOURS TRAVAILLES</th>
-                            <th>MONTANT PAYE</th>
-                            <th>SIGNATURE</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {"".join([f"<tr><td style='text-align: left;'>{r['PRENOM & NOM']}</td><td>{r['JOURS TRAVAILLES']}</td><td>{format_mille(r['MONTANT PAYE'])}</td><td></td></tr>" for _, r in suivi_assiduite.iterrows()])}
-                        <tr class="total-row">
-                            <td colspan="2">TOTAL</td>
-                            <td>{format_mille(total_montant)}</td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </body>
-            </html>
-            """
+                # Titre
+                elements.append(Paragraph(
+                    f"<b>FICHE DE PAIE - {prom} (SEMAINE {semaine})</b>",
+                    styles['Title']
+                ))
+                elements.append(Spacer(1, 20))
 
-            pdf_bytes = HTML(string=html_template).write_pdf()
-            # 2. Zone de prévisualisation
-            st.subheader("Aperçu de la fiche de paie")
-            display_pdf(pdf_bytes)
-            
-            st.write("---")
+                # Tableau
+                data = [df.columns.tolist()] + df.values.tolist()
+                table = Table(data)
+
+                table.setStyle(TableStyle([
+                    ('BACKGROUND', (0,0), (-1,0), colors.grey),
+                    ('TEXTCOLOR',(0,0),(-1,0),colors.white),
+                    ('ALIGN',(0,0),(-1,-1),'CENTER'),
+                    ('GRID', (0,0), (-1,-1), 1, colors.black),
+                    ('BACKGROUND', (0,-1), (-1,-1), colors.lightgrey),
+                ]))
+
+                elements.append(table)
+                elements.append(Spacer(1, 20))
+
+                # Total
+                elements.append(Paragraph(
+                    f"<b>Total à payer : {total:,.0f} XOF</b>".replace(",", " "),
+                    styles['Heading2']
+                ))
+
+                doc.build(elements)
+                buffer.seek(0)
+                return buffer
+
+            # =========================
+            # 🔹 AJOUT LIGNE TOTAL
+            # =========================
+            df_total = suivi.copy()
+            df_total.loc[len(df_total)] = ["TOTAL", "", total]
+
+            # =========================
+            # 🔹 DOWNLOAD PDF
+            # =========================
+            pdf_file = generate_pdf_paie(df_total, prom, semaine, total)
+
             st.download_button(
-                label="📥 Télécharger la Fiche de Paie PDF",
-                data=pdf_bytes,
+                label="📥 Télécharger la fiche de paie PDF",
+                data=pdf_file,
                 file_name=f"Fiche_Paie_{prom}_S{semaine}.pdf",
                 mime="application/pdf"
             )
 
-
-
-
-
-
-
-
-
-
         elif password != "":
             st.error("Mot de passe incorrect.")
-    elif periode == "Jour":
-        st.warning("Cette option n'est disponible que pour la vue Semaine.")
+
+    else:
+        st.warning("Disponible uniquement en mode Semaine")
