@@ -30,7 +30,7 @@ num_semaine = Chargement["Numero_semaine"].unique()
 
 colone= st.columns(5)
 # Choix de l’onglet
-menu = st.sidebar.radio("Navigation", ["AGREGATION","DETAIL","VALERIE"])
+menu = st.sidebar.radio("Navigation", ["AGREGATION","DETAIL","FICHE"])
 periode = colone[0].selectbox("", ["Jour","Semaine"])
 if periode == "Jour":
     semaine = colone[2].selectbox("", num_semaine)
@@ -553,7 +553,7 @@ elif menu == "DETAIL":
         colone[1].metric("💴 CA TATA", f"{donnee_ordre[donnee_ordre["TATA"] ==menu_sambou]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
 #-----------------------------------------------------------------#
 # Dans votre onglet VALERIE
-elif menu == "VALERIE":
+elif menu == "FICHE":
 
     if periode == "Semaine":
         prom = colone[4].selectbox("", ["TATA 1","TATA 2","TATA 3"])
