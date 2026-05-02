@@ -606,7 +606,7 @@ elif menu == "VALERIE":
             from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
             from reportlab.lib import colors
             from reportlab.lib.pagesizes import A4
-            from reportlab.lib.styles import getSampleStyleSheet
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
             from reportlab.lib.units import cm
             from io import BytesIO
             import os
@@ -628,7 +628,7 @@ elif menu == "VALERIE":
                 logo_path = "afrika_leyri_sas_logo.jpeg"  # vérifie bien le nom exact !
 
                 if os.path.exists(logo_path):
-                    logo = Image(logo_path, width=2*cm, height=1*cm)
+                    logo = Image(logo_path, width=2.5*cm, height=1.5*cm)
                 else:
                     logo = Paragraph("", styles["Normal"])
 
@@ -641,7 +641,7 @@ elif menu == "VALERIE":
 
                 header_table.setStyle([
                     ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-                    ('ALIGN', (1,0), (1,0), 'RIGHT'),  # TATA à droite
+                    ('ALIGN', (1,0), (1,0), 'LEFT'),  # TATA à droite
                 ])
 
                 elements.append(header_table)
@@ -650,7 +650,6 @@ elif menu == "VALERIE":
                 # =========================
                 # 🔹 TITRE
                 # =========================
-                from reportlab.lib.styles import ParagraphStyle
 
                 style_titre = ParagraphStyle(
                     name="TitrePerso",
@@ -665,7 +664,7 @@ elif menu == "VALERIE":
                         f"<b>ACTIVATION KAMLAC_PAIE SALAIRES FIXES DU {semaine} AU {semaine} AVRIL 2026</b>",
                         style_titre
                     )]],
-                    colWidths=[16*cm]
+                    colWidths=[16.1*cm]
                 )
 
                 titre.setStyle(TableStyle([
@@ -697,6 +696,8 @@ elif menu == "VALERIE":
                 table.setStyle(TableStyle([
                     # Bordures
                     ('GRID', (0,0), (-1,-1), 1, colors.black),
+                    # 🔥 Bordure extérieure en orange
+                    ('BOX', (0,0), (-1,-1), 2, colors.HexColor("#F7CC0C")),
 
                     # Header (entête)
                     ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#D7D2C9")),
