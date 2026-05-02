@@ -603,48 +603,130 @@ elif menu == "VALERIE":
             # =========================
             # 🔹 GENERATION PDF
             # =========================
-            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
             from reportlab.lib import colors
             from reportlab.lib.pagesizes import A4
             from reportlab.lib.styles import getSampleStyleSheet
+            from reportlab.lib.units import cm
             from io import BytesIO
+            import os
 
             def generate_pdf_paie(df, prom, semaine, total):
+
                 buffer = BytesIO()
-                doc = SimpleDocTemplate(buffer, pagesize=A4)
-                elements = []
+                doc = SimpleDocTemplate(buffer, pagesize=A4,
+                                        rightMargin=2*cm, leftMargin=2*cm,
+                                        topMargin=2*cm, bottomMargin=2*cm)
+
                 styles = getSampleStyleSheet()
+                elements = []
 
-                # Titre
-                elements.append(Paragraph(
-                    f"<b>FICHE DE PAIE - {prom} (SEMAINE {semaine})</b>",
-                    styles['Title']
-                ))
-                elements.append(Spacer(1, 20))
+                # =========================
+                # 🔹 HEADER (LOGO + TATA)
+                # =========================
 
-                # Tableau
-                data = [df.columns.tolist()] + df.values.tolist()
-                table = Table(data)
+                logo_path = "afrika_leyri_sas_logo.jpeg"  # vérifie bien le nom exact !
+
+                if os.path.exists(logo_path):
+                    logo = Image(logo_path, width=2*cm, height=1*cm)
+                else:
+                    logo = Paragraph("", styles["Normal"])
+
+                tata_text = Paragraph(f"<b>{prom}</b>", styles["Heading2"])
+
+                header_table = Table(
+                    [[logo, tata_text]],
+                    colWidths=[14*cm, 3*cm]
+                )
+
+                header_table.setStyle([
+                    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                    ('ALIGN', (1,0), (1,0), 'RIGHT'),  # TATA à droite
+                ])
+
+                elements.append(header_table)
+                elements.append(Spacer(1, 5))
+
+                # =========================
+                # 🔹 TITRE
+                # =========================
+                from reportlab.lib.styles import ParagraphStyle
+
+                style_titre = ParagraphStyle(
+                    name="TitrePerso",
+                    parent=styles["Title"],
+                    fontSize=12,   # 👈 taille réelle
+                    leading=14,
+                    alignment=1    # centré
+                )
+
+                titre = Table(
+                    [[Paragraph(
+                        f"<b>ACTIVATION KAMLAC_PAIE SALAIRES FIXES DU {semaine} AU {semaine} AVRIL 2026</b>",
+                        style_titre
+                    )]],
+                    colWidths=[16*cm]
+                )
+
+                titre.setStyle(TableStyle([
+                    ('BACKGROUND', (0,0), (-1,-1), colors.HexColor("#F7CC0C")),
+                    ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                    ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+                    ('TOPPADDING', (0,0), (-1,-1), 6),
+                ]))
+
+                elements.append(titre)
+                elements.append(Spacer(0, 0))
+
+                # =========================
+                # 🔹 TABLEAU
+                # =========================
+                data = [["PRENOM & NOM", "JOURS TRAVAILLES", "MONTANT PAYE", "SIGNATURE"]]
+
+                for _, row in df.iterrows():
+                    data.append([
+                        row["Nom"],
+                        row["Jours travaillés"],
+                        f"{int(row['Salaire']):,}".replace(",", " "),
+                        ""
+                    ])
+
+
+                table = Table(data, colWidths=[4*cm, 5*cm, 4*cm, 3*cm])
 
                 table.setStyle(TableStyle([
-                    ('BACKGROUND', (0,0), (-1,0), colors.grey),
-                    ('TEXTCOLOR',(0,0),(-1,0),colors.white),
-                    ('ALIGN',(0,0),(-1,-1),'CENTER'),
+                    # Bordures
                     ('GRID', (0,0), (-1,-1), 1, colors.black),
+
+                    # Header (entête)
+                    ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#D7D2C9")),
+                    ('TEXTCOLOR', (0,0), (-1,0), colors.black),
+                    ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+
+                    # 🔥 Cellule spécifique en rose
+                    ('BACKGROUND', (1,0), (1,0), colors.HexColor("#EECC92")),
+                    ('TEXTCOLOR', (1,0), (1,0), colors.black),
+
+                    # Alignement
+                    ('ALIGN',(1,1),(-2,-1),'CENTER'),
+                    ('ALIGN',(0,0),(-1,0),'CENTER'),
+                    ('ALIGN',(0,-1),(0,-1),'CENTER'),
+
+                    # Ligne TOTAL
                     ('BACKGROUND', (0,-1), (-1,-1), colors.lightgrey),
+                    ('TEXTCOLOR', (0,-1), (-1,-1), colors.black),
+                    ('FONTNAME', (0,-1), (-1,-1), 'Helvetica-Bold'),
+
+                    # Padding
+                    ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+                    ('TOPPADDING', (0,0), (-1,-1), 8),
                 ]))
 
                 elements.append(table)
-                elements.append(Spacer(1, 20))
-
-                # Total
-                elements.append(Paragraph(
-                    f"<b>Total à payer : {total:,.0f} XOF</b>".replace(",", " "),
-                    styles['Heading2']
-                ))
 
                 doc.build(elements)
                 buffer.seek(0)
+
                 return buffer
 
             # =========================
