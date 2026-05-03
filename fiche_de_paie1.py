@@ -30,7 +30,7 @@ num_semaine = Chargement["Numero_semaine"].unique()
 
 colone= st.columns(5)
 # Choix de l’onglet
-menu = st.sidebar.radio("Navigation", ["AGREGATION","DETAIL","FICHE"])
+menu = st.sidebar.radio("Navigation", ["AGREGATION","DETAIL","VALERIE"])
 periode = colone[0].selectbox("", ["Jour","Semaine"])
 if periode == "Jour":
     semaine = colone[2].selectbox("", num_semaine)
@@ -553,271 +553,193 @@ elif menu == "DETAIL":
         colone[1].metric("💴 CA TATA", f"{donnee_ordre[donnee_ordre["TATA"] ==menu_sambou]["Montant A verser"].sum():,.0f}".replace(",", " ")+" XOF")
 #-----------------------------------------------------------------#
 # Dans votre onglet VALERIE
-elif menu == "FICHE":
+elif menu == "VALERIE":
+
 
     if periode == "Semaine":
+        prom = colone[4].selectbox("", ["TATA 1","TATA 2","TATA 3"])
         st.sidebar.markdown("---")
         password = st.sidebar.text_input("Code d'accès requis", type="password")
-        # Récupération sécurisée du secret
-        VALERIE = st.secrets["credentials"]["valerie"]
-        OMAR = st.secrets["credentials"]["omar"]
-        MANSOUR = st.secrets["credentials"]["mansour"]
-        DJIBRIL = st.secrets["credentials"]["djibril"]
-        IBRAHIMA = st.secrets["credentials"]["ibrahima"]
-
-        if password == DJIBRIL:
-            prom ="TATA 1"
-            st.success("Accès autorisé pour DJIBRIL")
-            
-            data_semaine = Chargement[
-                (Chargement["Numero_semaine"] == semaine) &
-                (Chargement["Prenom_Nom_Promoteur"] != "Autre") &
-                (Chargement["Prenom_Nom_Promoteur"].notna()) &
-                (Chargement['tata'] == prom)
-            ]
-        elif password == MANSOUR:
-            prom = "TATA 2"
-            st.success("Accès autorisé pour MANSOUR")
-            data_semaine = Chargement[
-                (Chargement["Numero_semaine"] == semaine) &
-                (Chargement["Prenom_Nom_Promoteur"] != "Autre") &
-                (Chargement["Prenom_Nom_Promoteur"].notna()) &
-                (Chargement['tata'] == prom)
-            ]
-        elif password == IBRAHIMA:
-            prom = "TATA 3"
-            st.success("Accès autorisé pour IBRAHIMA")
-            data_semaine = Chargement[
-                (Chargement["Numero_semaine"] == semaine) &
-                (Chargement["Prenom_Nom_Promoteur"] != "Autre") &
-                (Chargement["Prenom_Nom_Promoteur"].notna()) &
-                (Chargement['tata'] == prom)
-            ]
-        elif password == VALERIE:
-            prom = colone[4].selectbox("", ["TATA 1","TATA 2","TATA 3"])
-            st.success("Accès autorisé pour VALERIE")
-            Donnees_F = pd.read_excel("Donnees_F.xlsx", engine='openpyxl')
-            data_semaine = Donnees_F[
-                (Donnees_F["Numero_semaine"] == semaine) &
-                (Donnees_F["Prenom_Nom_Promoteur"] != "Autre") &
-                (Donnees_F["Prenom_Nom_Promoteur"].notna()) &
-                (Donnees_F['tata'] == prom)
-            ]
-        elif password == OMAR:
-            prom = colone[4].selectbox("", ["TATA 1","TATA 2","TATA 3"])
-            choix_om=st.sidebar.radio("FICHIER", options=["FICHE", "RAPPORT"])
-            if choix_om == "FICHE":
-                # Le vrai rapport
-                
-                st.success("ACCES AUTORISE POUR OMAR AU VERSION 1")
-                data_semaine = Chargement[
-                    (Chargement["Numero_semaine"] == semaine) &
-                    (Chargement["Prenom_Nom_Promoteur"] != "Autre") &
-                    (Chargement["Prenom_Nom_Promoteur"].notna()) &
-                    (Chargement['tata'] == prom)
-                ]
-            elif choix_om == "RAPPORT":
-                # Pour le rapport modifié
-                st.success("ACCES AUTORISE POUR OMAR AU VERSION 1")
-                Donnees_F = pd.read_excel("Donnees_F.xlsx", engine='openpyxl')
-                data_semaine = Donnees_F[
-                (Donnees_F["Numero_semaine"] == semaine) &
-                (Donnees_F["Prenom_Nom_Promoteur"] != "Autre") &
-                (Donnees_F["Prenom_Nom_Promoteur"].notna()) &
-                (Donnees_F['tata'] == prom)
-            ]
-        else:
-            st.error("Code d'accès incorrect. Veuillez réessayer.")
-            st.stop()
-        jour_min = data_semaine["Date"].min().day
-        jour_max = data_semaine["Date"].max().day
-        mois_num = data_semaine["Date"].min().month
-        annee=data_semaine["Date"].min().year
-
-        mois_fr = {
-            1: "JANVIER", 2: "FÉVRIER", 3: "MARS",
-            4: "AVRIL", 5: "MAI", 6: "JUIN",
-            7: "JUILLET", 8: "AOÛT", 9: "SEPTEMBRE",
-            10: "OCTOBRE", 11: "NOVEMBRE", 12: "DÉCEMBRE"
-        }
-
-        mois_lettre = mois_fr[mois_num]
-
-        texte_periode = f"DU {jour_min} AU {jour_max} {mois_lettre} {annee}"
-        st.markdown(f"""<h4 style='text-align: center;'>FICHE DE PAIE {prom} DU {texte_periode}</h4>""", unsafe_allow_html=True)
-
-        # =========================
-        # 🔹 CREATION DE "suivi"
-        # =========================
-
-        suivi = data_semaine.groupby(
-            ['Prenom_Nom_Promoteur']
-        )['Date'].nunique().reset_index()
-
-        suivi.rename(columns={
-            'Prenom_Nom_Promoteur': 'Nom',
-            'Date': 'Jours travaillés'
-        }, inplace=True)
-
-        suivi['Salaire'] = suivi['Jours travaillés'] * 4000
-
-        total = suivi['Salaire'].sum()
-
-        # =========================
-        # AFFICHAGE
-        # =========================
-        affichage=suivi.copy()
-        affichage["Nom"] = affichage["Nom"].str.upper()
-        st.dataframe(affichage)
-        st.metric("💰 Total à payer", f"{total:,.0f} XOF".replace(",", " "))
-
-        # =========================
-        # 🔹 GENERATION PDF
-        # =========================
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
-        from reportlab.lib import colors
-        from reportlab.lib.pagesizes import A4
-        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-        from reportlab.lib.units import cm
-        from io import BytesIO
-        import os
-
-        def generate_pdf_paie(df, prom, jour_min, jour_max, mois_lettre, annee):
-            
-            buffer = BytesIO()
-            doc = SimpleDocTemplate(buffer, pagesize=A4,
-                                    rightMargin=2*cm, leftMargin=2*cm,
-                                    topMargin=2*cm, bottomMargin=2*cm)
-
-            styles = getSampleStyleSheet()
-            elements = []
-            texte_periode = f"DU {jour_min} AU {jour_max} {mois_lettre} {annee}"
-            # =========================
-            # 🔹 HEADER (LOGO + TATA)
-            # =========================
-
-            logo_path = "afrika_leyri_sas_logo.jpeg"  # vérifie bien le nom exact !
-
-            if os.path.exists(logo_path):
-                logo = Image(logo_path, width=2.5*cm, height=1.5*cm)
-            else:
-                logo = Paragraph("", styles["Normal"])
-
-            tata_text = Paragraph(f"<b>{prom}</b>", styles["Heading2"])
-
-            header_table = Table(
-                [[logo, tata_text]],
-                colWidths=[14*cm, 3*cm]
-            )
-
-            header_table.setStyle([
-                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-                ('ALIGN', (1,0), (1,0), 'LEFT'),  # TATA à droite
-            ])
-
-            elements.append(header_table)
-            elements.append(Spacer(1, 5))
-
-            # =========================
-            # 🔹 TITRE
-            # =========================
-
-            style_titre = ParagraphStyle(
-                name="TitrePerso",
-                parent=styles["Title"],
-                fontSize=12,   # 👈 taille réelle
-                leading=14,
-                alignment=1    # centré
-            )
-
-            titre = Table(
-                [[Paragraph(
-                    f"<b>ACTIVATION KAMLAC_PAIE SALAIRES FIXES {texte_periode}</b>",
-                    style_titre
-                )]],
-                colWidths=[16.1*cm]
-            )
-
-            titre.setStyle(TableStyle([
-                ('BACKGROUND', (0,0), (-1,-1), colors.HexColor("#F7CC0C")),
-                ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-                ('BOTTOMPADDING', (0,0), (-1,-1), 6),
-                ('TOPPADDING', (0,0), (-1,-1), 6),
-            ]))
-
-            elements.append(titre)
-            elements.append(Spacer(0, 0))
-
-            # =========================
-            # 🔹 TABLEAU
-            # =========================
-            data = [["PRENOM & NOM", "JOURS TRAVAILLES", "MONTANT PAYE", "SIGNATURE"]]
-
-            for _, row in df.iterrows():
-                data.append([
-                    row["Nom"].upper(),
-                    row["Jours travaillés"],
-                    f"{int(row['Salaire']):,}".replace(",", " "),
-                    ""
-                ])
-
-
-            table = Table(data, colWidths=[4.5*cm, 4.5*cm, 4*cm, 3*cm])
-
-            table.setStyle(TableStyle([
-                # Bordures
-                ('GRID', (0,0), (-1,-1), 1, colors.black),
-                # 🔥 Bordure extérieure en orange
-                ('BOX', (0,0), (-1,-1), 2, colors.HexColor("#F7CC0C")),
-
-                # Header (entête)
-                ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#D7D2C9")),
-                ('TEXTCOLOR', (0,0), (-1,0), colors.black),
-                ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-
-                # 🔥 Cellule spécifique en rose
-                ('BACKGROUND', (1,0), (1,0), colors.HexColor("#EECC92")),
-                ('TEXTCOLOR', (1,0), (1,0), colors.black),
-
-                # Alignement
-                ('ALIGN',(1,1),(-2,-1),'CENTER'),
-                ('ALIGN',(0,0),(-1,0),'CENTER'),
-                ('ALIGN',(0,-1),(0,-1),'CENTER'),
-
-                # Ligne TOTAL
-                ('BACKGROUND', (0,-1), (-1,-1), colors.lightgrey),
-                ('TEXTCOLOR', (0,-1), (-1,-1), colors.black),
-                ('FONTNAME', (0,-1), (-1,-1), 'Helvetica-Bold'),
-
-                # Padding
-                ('BOTTOMPADDING', (0,0), (-1,-1), 8),
-                ('TOPPADDING', (0,0), (-1,-1), 8),
-            ]))
-
-            elements.append(table)
-
-            doc.build(elements)
-            buffer.seek(0)
-
-            return buffer
-
-        # =========================
-        # 🔹 AJOUT LIGNE TOTAL
-        # =========================
-        df_total = suivi.copy()
-        df_total.loc[len(df_total)] = ["TOTAL", "", total]
         
-        # =========================
-        # 🔹 DOWNLOAD PDF
-        # =========================
-        pdf_file = generate_pdf_paie(df_total, prom, jour_min, jour_max, mois_lettre, annee)
+        # Récupération sécurisée du secret
+        #SECRET_PASSWORD = st.secrets["credentials"]["valerie"]
+        SECRET_PASSWORD = "1234" #SECRET_PASSWORD.strip()  # Supprimer les espaces éventuels
 
-        st.download_button(
-            label="📥 Télécharger la fiche de paie PDF",
-            data=pdf_file,
-            file_name=f"FICHE DE PAIE {prom} DU {jour_min:02d} AU {jour_max:02d} {mois_num}.pdf",
-            mime="application/pdf"
-        )
+        if password == SECRET_PASSWORD:
+            st.success("Accès autorisé")
+            st.markdown("---")
+            st.markdown(f"<br><h4 style='text-align: center;'>FICHE DE PAIE {prom} DE LA SEMAINE {semaine}</h4>", unsafe_allow_html=True)
+            #st.subheader("📊 Suivi de l'Assiduité des Agents")
 
-    else:
-        st.warning("Disponible uniquement en mode Semaine")
+            # 1. Filtrer les données pour la semaine sélectionnée
+            # On utilise 'donne_vente' (ou 'Chargement') filtré par semaine
+            data_semaine = Chargement[(Chargement["Numero_semaine"] == semaine) & (Chargement["Prenom_Nom_Promoteur"] != "Autre") & (Chargement["Prenom_Nom_Promoteur"].notna()) & (Chargement['tata'] == prom)]
+
+            # 2. Calculer le nombre de jours uniques travaillés par agent et par tata
+            # On suppose que si un agent est présent dans les données pour une date, il a travaillé
+            suivi_assiduite = data_semaine.groupby(['Prenom_Nom_Promoteur'])['Date'].nunique().reset_index()
+            suivi_assiduite.rename(columns={'Date': 'JOURS TRAVAILLES', 'Prenom_Nom_Promoteur': 'PRENOM & NOM'}, inplace=True)
+            # Ajouter la colonne Montant (Jours * 4000)
+            suivi_assiduite['MONTANT PAYE'] = suivi_assiduite['JOURS TRAVAILLES'] * 4000
+
+            #total_jours = suivi_assiduite['Jours Travaillés'].sum()
+            total_montant = suivi_assiduite['MONTANT PAYE'].sum()
+            import base64
+            from weasyprint import HTML
+            # --- Fonction utilitaire pour encoder l'image en base64 (pour le PDF) ---
+            def get_image_base64(path):
+                try:
+                    with open(path, "rb") as image_file:
+                        return base64.b64encode(image_file.read()).decode()
+                except:
+                    return ""
+                
+            # Fonction de formatage avec espace pour les milliers
+            def format_mille(valeur):
+                return "{:,.0f}".format(valeur).replace(",", " ")
+
+
+            # --- Fonction pour afficher le PDF dans Streamlit ---
+            def display_pdf(pdf_bytes):
+                # Encodage en base64 pour l'affichage iframe
+                base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
+                # Création du code HTML pour l'iframe
+                pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="600" type="application/pdf"></iframe>'
+                st.markdown(pdf_display, unsafe_allow_html=True)
+
+            # 2. Construction du HTML pour le PDF (Modèle exact du PDF téléchargé)
+            logo_b64 = get_image_base64("Logo Afrika Leyri.png")
+            
+            # Dates dynamiques (à adapter selon votre colonne Date si disponible)
+            titre_periode = f"PAIE SALAIRES FIXES SEMAINE {semaine}" 
+
+            # --- Mise à jour du template HTML pour le PDF ---
+
+            html_template = f"""
+            <html>
+            <head>
+                <style>
+                    @page {{ 
+                        size: A4; 
+                        margin: 15mm; 
+                    }}
+                    body {{ 
+                        font-family: 'Helvetica', Arial, sans-serif; 
+                        color: #000; 
+                    }}
+                    
+                    /* Structure de l'en-tête pour aligner Logo (Gauche) et Nom (Droite) */
+                    .header-table {{ 
+                        width: 100%; 
+                        border-bottom: 2px solid #000; 
+                        padding-bottom: 10px; 
+                        margin-bottom: 20px; 
+                    }}
+                    .logo-cell {{ 
+                        text-align: left; 
+                        vertical-align: middle; 
+                    }}
+                    .company-cell {{ 
+                        text-align: right; 
+                        vertical-align: middle; 
+                        font-size: 18pt; 
+                        font-weight: bold; 
+                        letter-spacing: 1px;
+                    }}
+                    
+                    .main-title {{ 
+                        text-align: center; 
+                        font-size: 12pt; 
+                        font-weight: bold; 
+                        margin: 25px 0; 
+                        text-transform: uppercase; 
+                        line-height: 1.4; 
+                    }}
+                    
+                    table.data {{ 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                    }}
+                    th {{ 
+                        border: 1px solid #000; 
+                        padding: 10px; 
+                        background-color: #f2f2f2; 
+                        font-size: 9pt; 
+                        text-transform: uppercase;
+                    }}
+                    td {{ 
+                        border: 1px solid #000; 
+                        padding: 8px; 
+                        text-align: center; 
+                        font-size: 10pt; 
+                    }}
+                    .total-row {{ 
+                        font-weight: bold; 
+                        background-color: #eee; 
+                    }}
+                </style>
+            </head>
+            <body>
+                <table class="header-table">
+                    <tr>
+                        <td class="logo-cell">
+                            <img src="data:image/png;base64,{logo_b64}" style="width: 140px;">
+                        </td>
+                        <td class="company-cell">
+                            {prom}
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="main-title">
+                    ACTIVATION KAMLAC PAIE SALAIRES FIXES DE LA SEMAINE {semaine})
+                </div>
+
+                <table class="data">
+                    <thead>
+                        <tr>
+                            <th>PRENOM & NOM</th>
+                            <th>JOURS TRAVAILLES</th>
+                            <th>MONTANT PAYE</th>
+                            <th>SIGNATURE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {"".join([f"<tr><td style='text-align: left;'>{r['PRENOM & NOM']}</td><td>{r['JOURS TRAVAILLES']}</td><td>{format_mille(r['MONTANT PAYE'])}</td><td></td></tr>" for _, r in suivi_assiduite.iterrows()])}
+                        <tr class="total-row">
+                            <td colspan="2">TOTAL</td>
+                            <td>{format_mille(total_montant)}</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </body>
+            </html>
+            """
+
+            pdf_bytes = HTML(string=html_template).write_pdf()
+            # 2. Zone de prévisualisation
+            st.subheader("Aperçu de la fiche de paie")
+            display_pdf(pdf_bytes)
+            
+            st.write("---")
+            st.download_button(
+                label="📥 Télécharger la Fiche de Paie PDF",
+                data=pdf_bytes,
+                file_name=f"Fiche_Paie_{prom}_S{semaine}.pdf",
+                mime="application/pdf"
+            )
+
+
+
+
+
+
+
+
+
+
+        elif password != "":
+            st.error("Mot de passe incorrect.")
+    elif periode == "Jour":
+        st.warning("Cette option n'est disponible que pour la vue Semaine.")
