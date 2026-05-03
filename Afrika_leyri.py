@@ -605,10 +605,11 @@ elif menu == "FICHE":
             ]
         elif password == OMAR:
             prom = colone[4].selectbox("", ["TATA 1","TATA 2","TATA 3"])
-            st.success("Accès autorisé pour OMAR")
             choix_om=st.sidebar.radio("FICHIER", options=["FICHE", "RAPPORT"])
             if choix_om == "FICHE":
                 # Le vrai rapport
+                
+                st.success("ACCES AUTORISE POUR OMAR AU VERSION 1")
                 data_semaine = Chargement[
                     (Chargement["Numero_semaine"] == semaine) &
                     (Chargement["Prenom_Nom_Promoteur"] != "Autre") &
@@ -617,6 +618,7 @@ elif menu == "FICHE":
                 ]
             elif choix_om == "RAPPORT":
                 # Pour le rapport modifié
+                st.success("ACCES AUTORISE POUR OMAR AU VERSION 1")
                 Donnees_F = pd.read_excel("Donnees_F.xlsx", engine='openpyxl')
                 data_semaine = Donnees_F[
                 (Donnees_F["Numero_semaine"] == semaine) &
