@@ -567,7 +567,7 @@ elif menu == "FICHE":
 
         if password == DJIBRIL:
             prom ="TATA 1"
-            st.success("Accès autorisé pour DJIBRIL")
+            st.success("ACCES AUTORISE POUR DJIBRIL")
             
             data_semaine = Chargement[
                 (Chargement["Numero_semaine"] == semaine) &
@@ -577,7 +577,7 @@ elif menu == "FICHE":
             ]
         elif password == MANSOUR:
             prom = "TATA 2"
-            st.success("Accès autorisé pour MANSOUR")
+            st.success("ACCES AUTORISE POUR MANSOUR")
             data_semaine = Chargement[
                 (Chargement["Numero_semaine"] == semaine) &
                 (Chargement["Prenom_Nom_Promoteur"] != "Autre") &
@@ -586,7 +586,7 @@ elif menu == "FICHE":
             ]
         elif password == IBRAHIMA:
             prom = "TATA 3"
-            st.success("Accès autorisé pour IBRAHIMA")
+            st.success("ACCES AUTORISE POUR IBRAHIMA")
             data_semaine = Chargement[
                 (Chargement["Numero_semaine"] == semaine) &
                 (Chargement["Prenom_Nom_Promoteur"] != "Autre") &
@@ -595,7 +595,7 @@ elif menu == "FICHE":
             ]
         elif password == VALERIE:
             prom = colone[4].selectbox("", ["TATA 1","TATA 2","TATA 3"])
-            st.success("Accès autorisé pour VALERIE")
+            st.success("ACCES AUTORISE POUR Mme KOFFI")
             Donnees_F = pd.read_excel("Donnees_F.xlsx", engine='openpyxl')
             data_semaine = Donnees_F[
                 (Donnees_F["Numero_semaine"] == semaine) &
@@ -618,7 +618,7 @@ elif menu == "FICHE":
                 ]
             elif choix_om == "RAPPORT":
                 # Pour le rapport modifié
-                st.success("ACCES AUTORISE POUR OMAR AU VERSION 1")
+                st.success("ACCES AUTORISE POUR OMAR AU VERSION 2")
                 Donnees_F = pd.read_excel("Donnees_F.xlsx", engine='openpyxl')
                 data_semaine = Donnees_F[
                 (Donnees_F["Numero_semaine"] == semaine) &
@@ -626,6 +626,9 @@ elif menu == "FICHE":
                 (Donnees_F["Prenom_Nom_Promoteur"].notna()) &
                 (Donnees_F['tata'] == prom)
             ]
+        elif password == "":
+            st.warning("Veuillez entrer un code d'accès pour continuer.")
+            st.stop()
         else:
             st.error("Code d'accès incorrect. Veuillez réessayer.")
             st.stop()
@@ -762,7 +765,7 @@ elif menu == "FICHE":
                 ])
 
 
-            table = Table(data, colWidths=[4.5*cm, 4.5*cm, 4*cm, 3*cm])
+            table = Table(data, colWidths=[5*cm, 4*cm, 4*cm, 3*cm])
 
             table.setStyle(TableStyle([
                 # Bordures
