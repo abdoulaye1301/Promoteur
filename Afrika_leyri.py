@@ -138,15 +138,16 @@ if menu == "AGREGATION":
         MANSOUR = st.secrets["credentials"]["mansour"]
         DJIBRIL = st.secrets["credentials"]["djibril"]
         IBRAHIMA = st.secrets["credentials"]["ibrahima"]
+        POYE = st.secrets["credentials"]["poye"]
 
         st.markdown(f"<h4 style='text-align: center;'>!---------- Stock restant après les ventes du {datea} ----------!</h4><br>", unsafe_allow_html=True)
         #st.subheader("Stock restant après les ventes")
         #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
         # Séparer les opérations
-        if (password == OMAR or password == MANSOUR or password == DJIBRIL or password == IBRAHIMA):
+        if password in [OMAR, MANSOUR, DJIBRIL, IBRAHIMA, POYE]:
         
-            if password == OMAR:
-                st.success("Accès autorisé, vous êtes connectés avec les identifiants de OMAR")
+            if password == OMAR or password == POYE:
+                st.success("Accès autorisé, vous êtes connectés avec les identifiants de "+("OMAR" if password == OMAR else "POYE"))
                 if sous_menu=="Stock":
                         prom = colone[3].selectbox("", ["TATA 1", "TATA 2", "TATA 3"])
                 else:
