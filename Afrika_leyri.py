@@ -131,60 +131,8 @@ if menu == "AGREGATION":
         donnee_ordre = donnee_agre.sort_values(by=["tata"], ascending=False)
 
 #-----------------------------------------------------------------#
-        st.markdown(f"<h4 style='text-align: center;'>!---------- Stock restant après les ventes du {datea} ----------!</h4><br>", unsafe_allow_html=True)
-        #st.subheader("Stock restant après les ventes")
-        #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
-        # Séparer les opérations
-        
-        if sous_menu=="Stock":
-            prom = colone[3].selectbox("", ["TATA 1", "TATA 2", "TATA 3"])
-        else:
-           prom = colone[4].selectbox("", ["TATA 1", "TATA 2", "TATA 3"]) 
 
-        if periode == "Jour":
-            stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
-            ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement['Numero_semaine'] == semaine) & (Chargement["Date"] <= dat) & (Chargement['tata'] == prom)]
-            descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == dat) & (Chargement['tata'] == prom)]
-        elif periode == "Semaine":
-            stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
-            ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement["Numero_semaine"] == semaine) & (Chargement['tata'] == prom)]
-            
-            min_dat = Chargement[Chargement["Numero_semaine"] == semaine]["Date"].dropna().unique()[0]
-            #dat = colone[2].selectbox("", min_date)
-            descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == prom)]
 
-        # Regrouper par tata et produit
-        stock_init = stock_lundi.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
-        ventes_total = ventes.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
-        stock_descente = descente.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
-
-        # Calcul du stock restant
-        stock_Theorique = stock_init.subtract(ventes_total, fill_value=0)
-
-        # Fusionner les résultats dans un seul DataFrame
-        df_final = stock_Theorique.reset_index().rename(columns={'Quantites_Cartons': 'Stock Théorique'})
-        df_final['Stock Restant'] = df_final.apply(
-            lambda row: stock_descente.get((row['tata'], row['Produit']), 0), axis=1
-        )
-        
-        # Arrondir à 2 chiffres après la virgule
-        df_final['Stock Théorique'] = df_final['Stock Théorique'].astype(float).round(2)
-        df_final['Stock Restant'] = df_final['Stock Restant'].astype(float).round(2)
-
-        # Ajouter la colonne Statut
-        df_final['Statut'] = df_final.apply(
-            lambda row: 'OK' if row['Stock Théorique'] == row['Stock Restant'] else 'Différence',
-            axis=1
-        )
-        df_final1 = df_final.drop("tata", axis=1).copy()
-        st.dataframe(df_final1)
-    #-----------------------------------------------------------------#
-    #---------------------------- Rapport de Omar ------------------#
-        donnee_agr = (
-            donne_vente.groupby(["tata","Produit"])
-            .agg({"Quantites_Cartons": "sum"})
-            .reset_index()
-        )
         if st.button("Voire plus de détails ") :
             st.sidebar.markdown("---")
             password = st.sidebar.text_input("Veuillez entrer le code d'accès", type="password")
@@ -193,12 +141,19 @@ if menu == "AGREGATION":
             MANSOUR = st.secrets["credentials"]["mansour"]
             DJIBRIL = st.secrets["credentials"]["djibril"]
             IBRAHIMA = st.secrets["credentials"]["ibrahima"]
+
+            st.markdown(f"<h4 style='text-align: center;'>!---------- Stock restant après les ventes du {datea} ----------!</h4><br>", unsafe_allow_html=True)
+            #st.subheader("Stock restant après les ventes")
+            #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
+            # Séparer les opérations
             if (password == OMAR or password == MANSOUR or password == DJIBRIL or password == IBRAHIMA):
-                st.markdown(f"<br><h4 style='text-align: center;'>!---------- Rapport des ventes du {datea} ----------!</h4>", unsafe_allow_html=True)
-                #st.subheader("Ventes par produit et Stock Restant")
+            
                 if password == OMAR:
                     st.success("Accès autorisé, vous êtes connectés avec les identifiants de OMAR")
-                    prom =st.selectbox("", ["TATA 1", "TATA 2", "TATA 3"])
+                    if sous_menu=="Stock":
+                            prom = colone[3].selectbox("", ["TATA 1", "TATA 2", "TATA 3"])
+                    else:
+                        prom = colone[4].selectbox("", ["TATA 1", "TATA 2", "TATA 3"]) 
                 elif password == MANSOUR:
                     st.success("Accès autorisé, vous êtes connectés avec les identifiants de MANSOUR")
                     prom = "TATA 2"
@@ -208,6 +163,55 @@ if menu == "AGREGATION":
                 elif password == IBRAHIMA:
                     st.success("Accès autorisé, vous êtes connectés avec les identifiants de IBRAHIMA")
                     prom = "TATA 3"
+            
+            
+
+                if periode == "Jour":
+                    stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
+                    ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement['Numero_semaine'] == semaine) & (Chargement["Date"] <= dat) & (Chargement['tata'] == prom)]
+                    descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == dat) & (Chargement['tata'] == prom)]
+                elif periode == "Semaine":
+                    stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
+                    ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement["Numero_semaine"] == semaine) & (Chargement['tata'] == prom)]
+                    
+                    min_dat = Chargement[Chargement["Numero_semaine"] == semaine]["Date"].dropna().unique()[0]
+                    #dat = colone[2].selectbox("", min_date)
+                    descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == prom)]
+
+                # Regrouper par tata et produit
+                stock_init = stock_lundi.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+                ventes_total = ventes.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+                stock_descente = descente.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+
+                # Calcul du stock restant
+                stock_Theorique = stock_init.subtract(ventes_total, fill_value=0)
+
+                # Fusionner les résultats dans un seul DataFrame
+                df_final = stock_Theorique.reset_index().rename(columns={'Quantites_Cartons': 'Stock Théorique'})
+                df_final['Stock Restant'] = df_final.apply(
+                    lambda row: stock_descente.get((row['tata'], row['Produit']), 0), axis=1
+                )
+                
+                # Arrondir à 2 chiffres après la virgule
+                df_final['Stock Théorique'] = df_final['Stock Théorique'].astype(float).round(2)
+                df_final['Stock Restant'] = df_final['Stock Restant'].astype(float).round(2)
+
+                # Ajouter la colonne Statut
+                df_final['Statut'] = df_final.apply(
+                    lambda row: 'OK' if row['Stock Théorique'] == row['Stock Restant'] else 'Différence',
+                    axis=1
+                )
+                df_final1 = df_final.drop("tata", axis=1).copy()
+                st.dataframe(df_final1)
+            #-----------------------------------------------------------------#
+            #---------------------------- Rapport de Omar ------------------#
+                donnee_agr = (
+                    donne_vente.groupby(["tata","Produit"])
+                    .agg({"Quantites_Cartons": "sum"})
+                    .reset_index()
+                )
+                st.markdown(f"<br><h4 style='text-align: center;'>!---------- Rapport des ventes du {datea} ----------!</h4>", unsafe_allow_html=True)
+                #st.subheader("Ventes par produit et Stock Restant")
                 donnee_agr = donnee_agr.rename(
                     columns={
                         "tata": "TATA",
