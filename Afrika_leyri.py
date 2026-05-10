@@ -194,7 +194,7 @@ if menu == "AGREGATION":
             DJIBRIL = st.secrets["credentials"]["djibril"]
             IBRAHIMA = st.secrets["credentials"]["ibrahima"]
             while not (password == OMAR or password == MANSOUR or password == DJIBRIL or password == IBRAHIMA):
-                st.sidebar.error("Code d'accès incorrect. Veuillez réessayer.")
+                st.error("Code d'accès incorrect. Veuillez réessayer.")
                 st.sidebar.markdown("---")
                 password = st.sidebar.text_input("Code d'accès requis", type="password")
             st.markdown(f"<br><h4 style='text-align: center;'>!---------- Rapport des ventes du {datea} ----------!</h4>", unsafe_allow_html=True)
