@@ -197,6 +197,7 @@ if menu == "AGREGATION":
                 st.error("Code d'accès incorrect. Veuillez réessayer.")
                 st.sidebar.markdown("---")
                 password = st.sidebar.text_input("Code d'accès requis", type="password")
+                st.stop()
             st.markdown(f"<br><h4 style='text-align: center;'>!---------- Rapport des ventes du {datea} ----------!</h4>", unsafe_allow_html=True)
             #st.subheader("Ventes par produit et Stock Restant")
             if password == OMAR:
