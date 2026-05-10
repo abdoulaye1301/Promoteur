@@ -202,7 +202,7 @@ if menu == "AGREGATION":
             #st.subheader("Ventes par produit et Stock Restant")
             if password == OMAR:
                 st.success("Accès autorisé, vous êtes connectés avec les identifiants de OMAR")
-                prom = prom
+                prom =st.selectbox("", ["TATA 1", "TATA 2", "TATA 3"])
             elif password == MANSOUR:
                 st.success("Accès autorisé, vous êtes connectés avec les identifiants de MANSOUR")
                 prom = "TATA 2"
