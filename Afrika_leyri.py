@@ -186,8 +186,7 @@ if menu == "AGREGATION":
             .reset_index()
         )
         if st.button("Voire plus de détails ") :
-            st.sidebar.markdown("---")
-            password = st.sidebar.text_input("Code d'accès requis", type="password")
+            password = ""
             st.info("Veuillez entrer le code d'accès pour voir les détails du rapport.")
             # Récupération sécurisée du secret
             OMAR = st.secrets["credentials"]["omar"]
