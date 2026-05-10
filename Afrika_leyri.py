@@ -131,239 +131,236 @@ if menu == "AGREGATION":
         donnee_ordre = donnee_agre.sort_values(by=["tata"], ascending=False)
 
 #-----------------------------------------------------------------#
+        st.sidebar.markdown("---")
+        password = st.sidebar.text_input("Veuillez entrer le code d'accès", type="password")
+        # Récupération sécurisée du secret
+        OMAR = st.secrets["credentials"]["omar"]
+        MANSOUR = st.secrets["credentials"]["mansour"]
+        DJIBRIL = st.secrets["credentials"]["djibril"]
+        IBRAHIMA = st.secrets["credentials"]["ibrahima"]
 
+        st.markdown(f"<h4 style='text-align: center;'>!---------- Stock restant après les ventes du {datea} ----------!</h4><br>", unsafe_allow_html=True)
+        #st.subheader("Stock restant après les ventes")
+        #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
+        # Séparer les opérations
+        if (password == OMAR or password == MANSOUR or password == DJIBRIL or password == IBRAHIMA):
+        
+            if password == OMAR:
+                st.success("Accès autorisé, vous êtes connectés avec les identifiants de OMAR")
+                if sous_menu=="Stock":
+                        prom = colone[3].selectbox("", ["TATA 1", "TATA 2", "TATA 3"])
+                else:
+                    prom = colone[4].selectbox("", ["TATA 1", "TATA 2", "TATA 3"]) 
+            elif password == MANSOUR:
+                st.success("Accès autorisé, vous êtes connectés avec les identifiants de MANSOUR")
+                prom = "TATA 2"
+            elif password == DJIBRIL:
+                st.success("Accès autorisé, vous êtes connectés avec les identifiants de DJIBRIL")
+                prom = "TATA 1"
+            elif password == IBRAHIMA:
+                st.success("Accès autorisé, vous êtes connectés avec les identifiants de IBRAHIMA")
+                prom = "TATA 3"
+        
+        
 
-        if st.button("Voire plus de détails ") :
-            st.sidebar.markdown("---")
-            password = st.sidebar.text_input("Veuillez entrer le code d'accès", type="password")
-            # Récupération sécurisée du secret
-            OMAR = st.secrets["credentials"]["omar"]
-            MANSOUR = st.secrets["credentials"]["mansour"]
-            DJIBRIL = st.secrets["credentials"]["djibril"]
-            IBRAHIMA = st.secrets["credentials"]["ibrahima"]
+            if periode == "Jour":
+                stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
+                ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement['Numero_semaine'] == semaine) & (Chargement["Date"] <= dat) & (Chargement['tata'] == prom)]
+                descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == dat) & (Chargement['tata'] == prom)]
+            elif periode == "Semaine":
+                stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
+                ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement["Numero_semaine"] == semaine) & (Chargement['tata'] == prom)]
+                
+                min_dat = Chargement[Chargement["Numero_semaine"] == semaine]["Date"].dropna().unique()[0]
+                #dat = colone[2].selectbox("", min_date)
+                descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == prom)]
 
-            st.markdown(f"<h4 style='text-align: center;'>!---------- Stock restant après les ventes du {datea} ----------!</h4><br>", unsafe_allow_html=True)
-            #st.subheader("Stock restant après les ventes")
-            #prom = st.selectbox("", ["TATA 1", "TATA 2","TATA 3"])
-            # Séparer les opérations
-            if (password == OMAR or password == MANSOUR or password == DJIBRIL or password == IBRAHIMA):
+            # Regrouper par tata et produit
+            stock_init = stock_lundi.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+            ventes_total = ventes.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+            stock_descente = descente.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+
+            # Calcul du stock restant
+            stock_Theorique = stock_init.subtract(ventes_total, fill_value=0)
+
+            # Fusionner les résultats dans un seul DataFrame
+            df_final = stock_Theorique.reset_index().rename(columns={'Quantites_Cartons': 'Stock Théorique'})
+            df_final['Stock Restant'] = df_final.apply(
+                lambda row: stock_descente.get((row['tata'], row['Produit']), 0), axis=1
+            )
             
-                if password == OMAR:
-                    st.success("Accès autorisé, vous êtes connectés avec les identifiants de OMAR")
-                    if sous_menu=="Stock":
-                            prom = colone[3].selectbox("", ["TATA 1", "TATA 2", "TATA 3"])
-                    else:
-                        prom = colone[4].selectbox("", ["TATA 1", "TATA 2", "TATA 3"]) 
-                elif password == MANSOUR:
-                    st.success("Accès autorisé, vous êtes connectés avec les identifiants de MANSOUR")
-                    prom = "TATA 2"
-                elif password == DJIBRIL:
-                    st.success("Accès autorisé, vous êtes connectés avec les identifiants de DJIBRIL")
-                    prom = "TATA 1"
-                elif password == IBRAHIMA:
-                    st.success("Accès autorisé, vous êtes connectés avec les identifiants de IBRAHIMA")
-                    prom = "TATA 3"
-            
-            
+            # Arrondir à 2 chiffres après la virgule
+            df_final['Stock Théorique'] = df_final['Stock Théorique'].astype(float).round(2)
+            df_final['Stock Restant'] = df_final['Stock Restant'].astype(float).round(2)
 
-                if periode == "Jour":
-                    stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
-                    ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement['Numero_semaine'] == semaine) & (Chargement["Date"] <= dat) & (Chargement['tata'] == prom)]
-                    descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == dat) & (Chargement['tata'] == prom)]
-                elif periode == "Semaine":
-                    stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
-                    ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement["Numero_semaine"] == semaine) & (Chargement['tata'] == prom)]
-                    
-                    min_dat = Chargement[Chargement["Numero_semaine"] == semaine]["Date"].dropna().unique()[0]
-                    #dat = colone[2].selectbox("", min_date)
-                    descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == prom)]
-
-                # Regrouper par tata et produit
-                stock_init = stock_lundi.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
-                ventes_total = ventes.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
-                stock_descente = descente.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
-
-                # Calcul du stock restant
-                stock_Theorique = stock_init.subtract(ventes_total, fill_value=0)
-
-                # Fusionner les résultats dans un seul DataFrame
-                df_final = stock_Theorique.reset_index().rename(columns={'Quantites_Cartons': 'Stock Théorique'})
-                df_final['Stock Restant'] = df_final.apply(
-                    lambda row: stock_descente.get((row['tata'], row['Produit']), 0), axis=1
-                )
-                
-                # Arrondir à 2 chiffres après la virgule
-                df_final['Stock Théorique'] = df_final['Stock Théorique'].astype(float).round(2)
-                df_final['Stock Restant'] = df_final['Stock Restant'].astype(float).round(2)
-
-                # Ajouter la colonne Statut
-                df_final['Statut'] = df_final.apply(
-                    lambda row: 'OK' if row['Stock Théorique'] == row['Stock Restant'] else 'Différence',
-                    axis=1
-                )
-                df_final1 = df_final.drop("tata", axis=1).copy()
-                st.dataframe(df_final1)
-            #-----------------------------------------------------------------#
-            #---------------------------- Rapport de Omar ------------------#
-                donnee_agr = (
-                    donne_vente.groupby(["tata","Produit"])
-                    .agg({"Quantites_Cartons": "sum"})
-                    .reset_index()
-                )
-                st.markdown(f"<br><h4 style='text-align: center;'>!---------- Rapport des ventes du {datea} ----------!</h4>", unsafe_allow_html=True)
-                #st.subheader("Ventes par produit et Stock Restant")
-                donnee_agr = donnee_agr.rename(
-                    columns={
-                        "tata": "TATA",
-                        "Quantites_Cartons": "Quantités vendues"
-                    }
-                )
-                donn=df_final[["tata","Produit","Stock Restant"]].sort_values(by=["tata"], ascending=False)
-                donn= donn.rename(
-                    columns={"tata": "TATA","Produit":"Produit","Stock Restant":"Stock Restant"})
-                donnee_ordr = donnee_agr.sort_values(by=["TATA"], ascending=False)
-                
-                # 3. Fusionner les deux sur TATA + Produit
-                donnee_ordr = pd.merge(donn, donnee_ordr, on=["TATA", "Produit"], how="left")
-
-                
-                
-                #colo = st.columns(5)
-                #st.dataframe(donnee_ordr[(donnee_ordr["TATA"] == prom)])
-                # Étape 2 : Génération du PDF avec matplotlib
-                # -----------------------
-                # 🔧 Fonction pour créer l'image avec les infos en haut
-                def generate_png_report(df, date_str, zone_str, nb_promoteurs,commentaire):
-                    fig, ax = plt.subplots(figsize=(12, len(df) * 0.6+1.5))
-                    ax.axis('off')
-                    # ✅ Texte commentaire à droite du cadre
-                    if commentaire:
-                        # ✅ Rectangle gris clair pour encadrer le commentaire
-                        comment_box = FancyBboxPatch(
-                            (0.63, 0.78),  # position (x, y) en coord. Axes (ajustable)
-                            0.35,          # largeur
-                            0.18,          # hauteur
-                            boxstyle="round,pad=0.01",
-                            transform=ax.transAxes,
-                            linewidth=1,
-                            edgecolor='gray',
-                            facecolor='#f0f0f0',  # gris clair
-                            zorder=1
-                        )
-                        ax.add_patch(comment_box)
-                    # retour à la ligne pour le commentaire
-                    wrapped_comment = textwrap.fill(commentaire, width=45)
-                    # au-dessus du rectangle
-                    ax.text(0.8, 0.88,wrapped_comment,
-                    transform=ax.transAxes,
-                    fontsize=11,
-                    weight='bold',
-                    va='center',
-                    ha='center',
-                    style='italic',
-                    color='red',
-                    wrap=True,
-                    zorder=2) 
-                    # Dimensions du rectangle d’en-tête (valeurs relatives à l’axe)
-                    header_x = 0.001    # gauche
-                    header_y = 0.76    # position verticale bas du bloc
-                    header_width = 0.996
-                    header_height = 0.24
-
-                    # ✅ Dessiner le rectangle d'encadrement
-                    rect = Rectangle((header_x, header_y), header_width, header_height,
-                                    transform=ax.transAxes,
-                                    fill=False, color='black', linewidth=1.5)
-                    ax.add_patch(rect)
-                    # En-tête
-                    plt.text(0.45, 0.95, f"Rapport de Stock du {prom}", ha='center', fontsize=14, transform=ax.transAxes, weight='bold')
-                    plt.text(0.01, 0.89, f"Date : {date_str}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
-                    plt.text(0.01, 0.84, f"Zone : {zone_str}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
-                    plt.text(0.01, 0.79, f"Nombre de promoteurs : {nb_promoteurs}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
-
-                    # Tableau matplotlib
-                    table = ax.table(cellText=df.values,
-                                    colLabels=df.columns,
-                                    cellLoc='center',
-                                    loc='center')
-
-                    table.scale(1, 1.5)
-
-                    # ➕ Mettre en rouge texte + fond si "Stock Restant" < 10
-                    stock_col_idx = df.columns.get_loc("Stock Restant")
-                    for i in range(len(df)):
-                        val = df.iloc[i, stock_col_idx]
-                        if isinstance(val, (int, float)) and val < 10:
-                            cell = table[i + 1, stock_col_idx]  # +1 pour l’en-tête
-                            cell.set_text_props(color='white', weight='bold')  # texte blanc pour lisibilité
-                            cell.set_facecolor('#FF5C5C')  # rouge clair (hex)
-                    # ✅ Ligne "TOTAL" en gras et fond orange
-                    total_row_index = len(df)  # ligne après les données
-                    for j in range(len(df.columns)):
-                        cell = table[total_row_index, j]
-                        cell.set_text_props(weight='bold')
-                        cell.set_facecolor('#FFA500')  # orange clair
-                    # Sauvegarde
-                    buffer = BytesIO()
-                    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=200)
-                    plt.close()
-                    buffer.seek(0)
-                    return buffer
-                # Calculer le nombre de promoteurs
-                # Génération et bouton
-                # Génération de l'image PNG avec en-tête
-                if periode == "Jour":
-                    zone = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
-                    nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())-1
-                    commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["Commentaire"].dropna().unique().tolist()
-                elif periode == "Semaine":
-                    # Pour la semaine, on peut prendre la zone de la première entrée de la semaine
-                    zone=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["zone"].dropna().unique()
-                    nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
-                    commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["Commentaire"].dropna().unique().tolist()
-                # Si le commentaire est vide, on utilise une chaîne vide
-                if len(commente) == 0: 
-                    commente.append("Aucune observation") 
-                # Ajout d'une ligne "Total" avec les sommes des colonnes numériques
-                filtre = donnee_ordr[(donnee_ordr["TATA"] == prom)]
-                filtre['Quantités vendues'] = filtre['Quantités vendues'].fillna(0)
-                # Calcule des totaux
-                quantite_total = filtre['Quantités vendues'].sum().round(2)
-                stock_restant_total = filtre['Stock Restant'].sum().round(2)
-                total_row = {
-                "TATA": "", 
-                "Produit": "TOTAL", 
-                "Stock Restant": stock_restant_total,
-                "Quantités vendues": quantite_total
+            # Ajouter la colonne Statut
+            df_final['Statut'] = df_final.apply(
+                lambda row: 'OK' if row['Stock Théorique'] == row['Stock Restant'] else 'Différence',
+                axis=1
+            )
+            df_final1 = df_final.drop("tata", axis=1).copy()
+            st.dataframe(df_final1)
+        #-----------------------------------------------------------------#
+        #---------------------------- Rapport de Omar ------------------#
+            donnee_agr = (
+                donne_vente.groupby(["tata","Produit"])
+                .agg({"Quantites_Cartons": "sum"})
+                .reset_index()
+            )
+            st.markdown(f"<br><h4 style='text-align: center;'>!---------- Rapport des ventes du {datea} ----------!</h4>", unsafe_allow_html=True)
+            #st.subheader("Ventes par produit et Stock Restant")
+            donnee_agr = donnee_agr.rename(
+                columns={
+                    "tata": "TATA",
+                    "Quantites_Cartons": "Quantités vendues"
                 }
-                df_final_total = pd.concat([filtre, pd.DataFrame([total_row])], ignore_index=True)
-                df_final_total["Stock Restant"] = df_final_total["Stock Restant"].round(2)
-                df_final_total["Quantités vendues"] = df_final_total["Quantités vendues"].round(2)
-                df_final_total1 = df_final_total.drop("TATA", axis=1).copy()
-                # Style avec HTML
-                def highlight_html(val):
-                    if isinstance(val, (int, float)) and val < 10:
-                        return 'background-color: red; color: white'
-                    return ''
+            )
+            donn=df_final[["tata","Produit","Stock Restant"]].sort_values(by=["tata"], ascending=False)
+            donn= donn.rename(
+                columns={"tata": "TATA","Produit":"Produit","Stock Restant":"Stock Restant"})
+            donnee_ordr = donnee_agr.sort_values(by=["TATA"], ascending=False)
+            
+            # 3. Fusionner les deux sur TATA + Produit
+            donnee_ordr = pd.merge(donn, donnee_ordr, on=["TATA", "Produit"], how="left")
 
-                #df_final_total = df_final_total.style.applymap(highlight_html, subset=["Stock Restant"])
-                #styled_df=df_final_total
-                #styled_df = styled_df.set_properties(**{'text-align': 'center'})
-                # Affichage avec markdown HTML (nécessite unsafe_allow_html=True)
-                #st.markdown(styled_df.to_html(escape=False), unsafe_allow_html=True)
-                #st.dataframe(df_final_total, use_container_width=True)
-                png_bytes = generate_png_report(df_final_total1, datea, zone[0], nb_promoteurs,commente[0])
-                # ✅ Afficher l'aperçu de l'image directement dans l'interface
-                st.image(png_bytes, caption="", use_container_width=True)
-                #png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)])
-                st.download_button(
-                    label="📥 Télécharger le rapport en PNG",
-                    data=png_bytes,
-                    file_name=f"rapport_{prom}_du_{datea}.png",
-                    mime="image/png"
-                )
-            else:
-                st.error("Accès refusé, code d'accès incorrect.")
+            
+            
+            #colo = st.columns(5)
+            #st.dataframe(donnee_ordr[(donnee_ordr["TATA"] == prom)])
+            # Étape 2 : Génération du PDF avec matplotlib
+            # -----------------------
+            # 🔧 Fonction pour créer l'image avec les infos en haut
+            def generate_png_report(df, date_str, zone_str, nb_promoteurs,commentaire):
+                fig, ax = plt.subplots(figsize=(12, len(df) * 0.6+1.5))
+                ax.axis('off')
+                # ✅ Texte commentaire à droite du cadre
+                if commentaire:
+                    # ✅ Rectangle gris clair pour encadrer le commentaire
+                    comment_box = FancyBboxPatch(
+                        (0.63, 0.78),  # position (x, y) en coord. Axes (ajustable)
+                        0.35,          # largeur
+                        0.18,          # hauteur
+                        boxstyle="round,pad=0.01",
+                        transform=ax.transAxes,
+                        linewidth=1,
+                        edgecolor='gray',
+                        facecolor='#f0f0f0',  # gris clair
+                        zorder=1
+                    )
+                    ax.add_patch(comment_box)
+                # retour à la ligne pour le commentaire
+                wrapped_comment = textwrap.fill(commentaire, width=45)
+                # au-dessus du rectangle
+                ax.text(0.8, 0.88,wrapped_comment,
+                transform=ax.transAxes,
+                fontsize=11,
+                weight='bold',
+                va='center',
+                ha='center',
+                style='italic',
+                color='red',
+                wrap=True,
+                zorder=2) 
+                # Dimensions du rectangle d’en-tête (valeurs relatives à l’axe)
+                header_x = 0.001    # gauche
+                header_y = 0.76    # position verticale bas du bloc
+                header_width = 0.996
+                header_height = 0.24
+
+                # ✅ Dessiner le rectangle d'encadrement
+                rect = Rectangle((header_x, header_y), header_width, header_height,
+                                transform=ax.transAxes,
+                                fill=False, color='black', linewidth=1.5)
+                ax.add_patch(rect)
+                # En-tête
+                plt.text(0.45, 0.95, f"Rapport de Stock du {prom}", ha='center', fontsize=14, transform=ax.transAxes, weight='bold')
+                plt.text(0.01, 0.89, f"Date : {date_str}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
+                plt.text(0.01, 0.84, f"Zone : {zone_str}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
+                plt.text(0.01, 0.79, f"Nombre de promoteurs : {nb_promoteurs}", ha='left', fontsize=12, transform=ax.transAxes, weight='bold')
+
+                # Tableau matplotlib
+                table = ax.table(cellText=df.values,
+                                colLabels=df.columns,
+                                cellLoc='center',
+                                loc='center')
+
+                table.scale(1, 1.5)
+
+                # ➕ Mettre en rouge texte + fond si "Stock Restant" < 10
+                stock_col_idx = df.columns.get_loc("Stock Restant")
+                for i in range(len(df)):
+                    val = df.iloc[i, stock_col_idx]
+                    if isinstance(val, (int, float)) and val < 10:
+                        cell = table[i + 1, stock_col_idx]  # +1 pour l’en-tête
+                        cell.set_text_props(color='white', weight='bold')  # texte blanc pour lisibilité
+                        cell.set_facecolor('#FF5C5C')  # rouge clair (hex)
+                # ✅ Ligne "TOTAL" en gras et fond orange
+                total_row_index = len(df)  # ligne après les données
+                for j in range(len(df.columns)):
+                    cell = table[total_row_index, j]
+                    cell.set_text_props(weight='bold')
+                    cell.set_facecolor('#FFA500')  # orange clair
+                # Sauvegarde
+                buffer = BytesIO()
+                plt.savefig(buffer, format='png', bbox_inches='tight', dpi=200)
+                plt.close()
+                buffer.seek(0)
+                return buffer
+            # Calculer le nombre de promoteurs
+            # Génération et bouton
+            # Génération de l'image PNG avec en-tête
+            if periode == "Jour":
+                zone = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
+                nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())-1
+                commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["Commentaire"].dropna().unique().tolist()
+            elif periode == "Semaine":
+                # Pour la semaine, on peut prendre la zone de la première entrée de la semaine
+                zone=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["zone"].dropna().unique()
+                nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
+                commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["Commentaire"].dropna().unique().tolist()
+            # Si le commentaire est vide, on utilise une chaîne vide
+            if len(commente) == 0: 
+                commente.append("Aucune observation") 
+            # Ajout d'une ligne "Total" avec les sommes des colonnes numériques
+            filtre = donnee_ordr[(donnee_ordr["TATA"] == prom)]
+            filtre['Quantités vendues'] = filtre['Quantités vendues'].fillna(0)
+            # Calcule des totaux
+            quantite_total = filtre['Quantités vendues'].sum().round(2)
+            stock_restant_total = filtre['Stock Restant'].sum().round(2)
+            total_row = {
+            "TATA": "", 
+            "Produit": "TOTAL", 
+            "Stock Restant": stock_restant_total,
+            "Quantités vendues": quantite_total
+            }
+            df_final_total = pd.concat([filtre, pd.DataFrame([total_row])], ignore_index=True)
+            df_final_total["Stock Restant"] = df_final_total["Stock Restant"].round(2)
+            df_final_total["Quantités vendues"] = df_final_total["Quantités vendues"].round(2)
+            df_final_total1 = df_final_total.drop("TATA", axis=1).copy()
+            # Style avec HTML
+            def highlight_html(val):
+                if isinstance(val, (int, float)) and val < 10:
+                    return 'background-color: red; color: white'
+                return ''
+
+            #df_final_total = df_final_total.style.applymap(highlight_html, subset=["Stock Restant"])
+            #styled_df=df_final_total
+            #styled_df = styled_df.set_properties(**{'text-align': 'center'})
+            # Affichage avec markdown HTML (nécessite unsafe_allow_html=True)
+            #st.markdown(styled_df.to_html(escape=False), unsafe_allow_html=True)
+            #st.dataframe(df_final_total, use_container_width=True)
+            png_bytes = generate_png_report(df_final_total1, datea, zone[0], nb_promoteurs,commente[0])
+            # ✅ Afficher l'aperçu de l'image directement dans l'interface
+            st.image(png_bytes, caption="", use_container_width=True)
+            #png_bytes = generate_png_report(donnee_ordr[(donnee_ordr["TATA"] == prom)])
+            st.download_button(
+                label="📥 Télécharger le rapport en PNG",
+                data=png_bytes,
+                file_name=f"rapport_{prom}_du_{datea}.png",
+                mime="image/png"
+            )
+        else:
+            st.error("Accès refusé, code d'accès incorrect.")
 #-----------------------------------------------------------------#
 #-----------------------------------------------------------------#
 #-----------------------------------------------------------------#
