@@ -901,7 +901,7 @@ elif menu == "FICHE":
 
                 colonnne[0].metric("TRANSPORT TATA", f"{statio_F["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
                 colonnne[1].metric("STATIONNEMENT", f"{statio_F["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
-                st.sidebar.markdown("===")
+                st.markdown("---")
                 st.markdown(f"<h4 style='text-align: center;'>SALAIRES TATAS : {Salaire_Tatas:,.2f}".replace(",", " ")+" XOF</h4>", unsafe_allow_html=True)
                 Depenses = statio_F["Transport"].sum() + statio_F["Stationnement"].sum() + Salaire_Tatas
                 st.markdown(f"<h3 style='text-align: center;'>SALAIRES + TRANSPORT + STATIONNEMENT : {Depenses:,.2f}".replace(",", " ")+" XOF</h3>", unsafe_allow_html=True)
