@@ -843,69 +843,73 @@ elif menu == "FICHE":
             file_name=f"FICHE DE PAIE {prom} DU {jour_min:02d} AU {jour_max:02d} {mois_num}.pdf",
             mime="application/pdf"
         )
+        
         if password in [OMAR, VALERIE]:
-            # ========================= RECAPITULATIF =========================
-            st.markdown(f"<h4 style='text-align: center;'>!---------- RESUME VERSEMENT DE LA SEMAINE {datea} ----------!</h4><br>", unsafe_allow_html=True)
-            #st.subheader("Récapitulatif des ventes")
-            donnee_agre_F = (
-                donne_vente_F.groupby(["tata"])
-                .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
-                .reset_index()
-            )
-            donnee_agre_F = donnee_agre_F.rename(
-                columns={
-                    "Quantites_Cartons": "Quantités",
-                    "Montant": "Montant A verser",
-                }
-            )
-            donnee_ordre_F = donnee_agre_F.sort_values(by=["tata"], ascending=False)
+            if password == OMAR and choix_om == "FICHE":
+                st.warning("Le récapitulatif de la semaine est disponible dans l'onglet RAPPORT.")
+            else:
+                # ========================= RECAPITULATIF =========================
+                st.markdown(f"<h4 style='text-align: center;'>!---------- RESUME VERSEMENT DE LA SEMAINE {datea} ----------!</h4><br>", unsafe_allow_html=True)
+                #st.subheader("Récapitulatif des ventes")
+                donnee_agre_F = (
+                    donne_vente_F.groupby(["tata"])
+                    .agg({"Quantites_Cartons": "sum", "Montant": "sum"})
+                    .reset_index()
+                )
+                donnee_agre_F = donnee_agre_F.rename(
+                    columns={
+                        "Quantites_Cartons": "Quantités",
+                        "Montant": "Montant A verser",
+                    }
+                )
+                donnee_ordre_F = donnee_agre_F.sort_values(by=["tata"], ascending=False)
 
-            # ============================= Variables donnees pour le salaire ============================= #
-            data_semaine_sa = Donnees_F[
-                    (Donnees_F["Numero_semaine"] == semaine) &
-                    (Donnees_F["Prenom_Nom_Promoteur"] != "Autre") &
-                    (Donnees_F["Prenom_Nom_Promoteur"].notna())
-            ]
-            suivi_sal = data_semaine_sa.groupby(
-                ['Prenom_Nom_Promoteur']
-            )['Date'].nunique().reset_index()
+                # ============================= Variables donnees pour le salaire ============================= #
+                data_semaine_sa = Donnees_F[
+                        (Donnees_F["Numero_semaine"] == semaine) &
+                        (Donnees_F["Prenom_Nom_Promoteur"] != "Autre") &
+                        (Donnees_F["Prenom_Nom_Promoteur"].notna())
+                ]
+                suivi_sal = data_semaine_sa.groupby(
+                    ['Prenom_Nom_Promoteur']
+                )['Date'].nunique().reset_index()
 
-            suivi_sal.rename(columns={
-                'Prenom_Nom_Promoteur': 'Nom',
-                'Date': 'Jours travaillés'
-            }, inplace=True)
+                suivi_sal.rename(columns={
+                    'Prenom_Nom_Promoteur': 'Nom',
+                    'Date': 'Jours travaillés'
+                }, inplace=True)
 
-            suivi_sal['Salaire'] = suivi_sal['Jours travaillés'] * 4000
+                suivi_sal['Salaire'] = suivi_sal['Jours travaillés'] * 4000
 
-            Salaire_Tatas = suivi_sal['Salaire'].sum()
-            #st.dataframe(donnee_ordre)
+                Salaire_Tatas = suivi_sal['Salaire'].sum()
+                #st.dataframe(donnee_ordre)
 
-            # ============================= Variables donnees restantes ============================= #
-            donnee_RZ_Livr= donnee_RZ[(donnee_RZ["Operation"] == "Livraison") & (donnee_RZ["Semaine"] == semaine)]
-            CA_donnee_RZ=donnee_RZ_Livr["Prix Total"].sum()
-            Remise = pd.read_excel("Remise.xlsx", engine='openpyxl')
+                # ============================= Variables donnees restantes ============================= #
+                donnee_RZ_Livr= donnee_RZ[(donnee_RZ["Operation"] == "Livraison") & (donnee_RZ["Semaine"] == semaine)]
+                CA_donnee_RZ=donnee_RZ_Livr["Prix Total"].sum()
+                Remise = pd.read_excel("Remise.xlsx", engine='openpyxl')
 
-            colonnne= st.columns(2)
-            
-            colonnne[0].metric("CA RZ", f"{CA_donnee_RZ:,.2f}".replace(",", " ")+" XOF")
-            colonnne[1].metric("CA TATA", f"{donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
-            colonnne[0].metric("CA TOTAL (RZ + TATA)", f"{CA_donnee_RZ+donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
-            colonnne[1].metric("REMISE", f"{Remise['Montant'].sum():,.2f}".replace(",", " "))
-            #ca_restant=descente_T2["Montant"].sum()+descente_T1["Montant"].sum() +descente_T3["Montant"].sum()
-            #rest=stock_descente_T1.sum()+stock_descente_T2.sum()+stock_descente_T3.sum()
+                colonnne= st.columns(2)
+                
+                colonnne[0].metric("CA RZ", f"{CA_donnee_RZ:,.2f}".replace(",", " ")+" XOF")
+                colonnne[1].metric("CA TATA", f"{donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
+                colonnne[0].metric("CA TOTAL (RZ + TATA)", f"{CA_donnee_RZ+donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
+                colonnne[1].metric("REMISE", f"{Remise['Montant'].sum():,.2f}".replace(",", " "))
+                #ca_restant=descente_T2["Montant"].sum()+descente_T1["Montant"].sum() +descente_T3["Montant"].sum()
+                #rest=stock_descente_T1.sum()+stock_descente_T2.sum()+stock_descente_T3.sum()
 
 
-            colonnne[0].metric("TRANSPORT TATA", f"{statio_F["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
-            colonnne[1].metric("STATIONNEMENT", f"{statio_F["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
+                colonnne[0].metric("TRANSPORT TATA", f"{statio_F["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
+                colonnne[1].metric("STATIONNEMENT", f"{statio_F["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
 
-            st.markdown(f"<h4 style='text-align: center;'>SALAIRES TATAS : {Salaire_Tatas:,.2f}".replace(",", " ")+" XOF</h4>", unsafe_allow_html=True)
-            Depenses = statio_F["Transport"].sum() + statio_F["Stationnement"].sum() + Salaire_Tatas
-            st.markdown(f"<h3 style='text-align: center;'>SALAIRES + TRANSPORT + STATIONNEMENT : {Depenses:,.2f}".replace(",", " ")+" XOF</h3>", unsafe_allow_html=True)
-            
-            # MONTANT A VERSER PAR OMAR = CA TATA + CA RZ - REMISE - TRANSPORT - STATIONNEMENT - SALAIRE TATAS
-            mnt_verser = (CA_donnee_RZ + donnee_ordre_F['Montant A verser'].sum()) - (Depenses + Remise['Montant'].sum())
-            st.markdown(f"<h2 style='text-align: center;'>MONTANT À VERSER PAR OMAR : {mnt_verser:,.2f}".replace(",", " ")+" XOF</h2>", unsafe_allow_html=True)
-            
+                st.markdown(f"<h4 style='text-align: center;'>SALAIRES TATAS : {Salaire_Tatas:,.2f}".replace(",", " ")+" XOF</h4>", unsafe_allow_html=True)
+                Depenses = statio_F["Transport"].sum() + statio_F["Stationnement"].sum() + Salaire_Tatas
+                st.markdown(f"<h3 style='text-align: center;'>SALAIRES + TRANSPORT + STATIONNEMENT : {Depenses:,.2f}".replace(",", " ")+" XOF</h3>", unsafe_allow_html=True)
+                
+                # MONTANT A VERSER PAR OMAR = CA TATA + CA RZ - REMISE - TRANSPORT - STATIONNEMENT - SALAIRE TATAS
+                mnt_verser = (CA_donnee_RZ + donnee_ordre_F['Montant A verser'].sum()) - (Depenses + Remise['Montant'].sum())
+                st.markdown(f"<h2 style='text-align: center;'>MONTANT À VERSER PAR OMAR : {mnt_verser:,.2f}".replace(",", " ")+" XOF</h2>", unsafe_allow_html=True)
+                
 
     else:
         st.warning("Disponible uniquement en mode Semaine")
