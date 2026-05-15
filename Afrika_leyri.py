@@ -846,7 +846,7 @@ elif menu == "FICHE":
         
         if password in [OMAR, VALERIE]:
             if password == OMAR and choix_om == "FICHE":
-                st.warning("Le récapitulatif de la semaine est disponible dans l'onglet RAPPORT.")
+                st.warning("Le résumé de la semaine est disponible dans l'onglet RAPPORT.")
             else:
                 # ========================= RECAPITULATIF =========================
                 st.markdown(f"<h4 style='text-align: center;'>!---------- RESUME VERSEMENT DE LA SEMAINE {datea} ----------!</h4><br>", unsafe_allow_html=True)
@@ -901,7 +901,7 @@ elif menu == "FICHE":
 
                 colonnne[0].metric("TRANSPORT TATA", f"{statio_F["Transport"].sum():,.0f}".replace(",", " ")+" XOF")
                 colonnne[1].metric("STATIONNEMENT", f"{statio_F["Stationnement"].sum():,.0f}".replace(",", " ")+" XOF")
-
+                st.sidebar.markdown("===")
                 st.markdown(f"<h4 style='text-align: center;'>SALAIRES TATAS : {Salaire_Tatas:,.2f}".replace(",", " ")+" XOF</h4>", unsafe_allow_html=True)
                 Depenses = statio_F["Transport"].sum() + statio_F["Stationnement"].sum() + Salaire_Tatas
                 st.markdown(f"<h3 style='text-align: center;'>SALAIRES + TRANSPORT + STATIONNEMENT : {Depenses:,.2f}".replace(",", " ")+" XOF</h3>", unsafe_allow_html=True)
