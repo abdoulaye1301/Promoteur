@@ -637,10 +637,10 @@ elif menu == "FICHE":
                 (Donnees_F["Prenom_Nom_Promoteur"] != "Autre") &
                 (Donnees_F["Prenom_Nom_Promoteur"].notna()) &
                 (Donnees_F['tata'] == prom)
-            ]
-            statio_F = Donnees_F[(Donnees_F["Numero_semaine"] == semaine)]
-            datea = semaine
-            donne_vente_F = Donnees_F[(Donnees_F["Operation"] == "Vente") & (Donnees_F["Numero_semaine"] == semaine)]
+                ]
+                statio_F = Donnees_F[(Donnees_F["Numero_semaine"] == semaine)]
+                datea = semaine
+                donne_vente_F = Donnees_F[(Donnees_F["Operation"] == "Vente") & (Donnees_F["Numero_semaine"] == semaine)]
         elif password == "":
             st.warning("Veuillez entrer un code d'accès pour continuer.")
             st.stop()
