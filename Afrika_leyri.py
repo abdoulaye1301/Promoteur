@@ -894,7 +894,7 @@ elif menu == "FICHE":
                 colonnne[0].metric("CA RZ", f"{CA_donnee_RZ:,.2f}".replace(",", " ")+" XOF")
                 colonnne[1].metric("CA TATA", f"{donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
                 colonnne[0].metric("CA TOTAL (RZ + TATA)", f"{CA_donnee_RZ+donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
-                colonnne[1].metric("REMISE", f"{Remise['Montant'].sum():,.2f}".replace(",", " "+" XOF"))
+                colonnne[1].metric("REMISE", f"{Remise['Montant'].sum():,.2f}".replace(",", " ")+" XOF")
                 #ca_restant=descente_T2["Montant"].sum()+descente_T1["Montant"].sum() +descente_T3["Montant"].sum()
                 #rest=stock_descente_T1.sum()+stock_descente_T2.sum()+stock_descente_T3.sum()
 
