@@ -320,6 +320,7 @@ if menu == "AGREGATION":
                 nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
                 commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["Commentaire"].dropna().unique().tolist()
             # Si le commentaire est vide, on utilise une chaîne vide
+            commente=[""]
             if len(commente) == 0: 
                 commente.append("Aucune observation") 
             # Ajout d'une ligne "Total" avec les sommes des colonnes numériques
