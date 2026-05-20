@@ -134,16 +134,11 @@ if menu == "AGREGATION":
         st.sidebar.markdown("---")
         password = st.sidebar.text_input("Veuillez entrer le code d'accès", type="password")
         # Récupération sécurisée du secret
-        """OMAR = st.secrets["credentials"]["omar"]
+        OMAR = st.secrets["credentials"]["omar"]
         MANSOUR = st.secrets["credentials"]["mansour"]
         DJIBRIL = st.secrets["credentials"]["djibril"]
         IBRAHIMA = st.secrets["credentials"]["ibrahima"]
-        POUYE = st.secrets["credentials"]["pouye"]"""
-        OMAR="OMAR26"
-        MANSOUR="MANSOUR26"
-        DJIBRIL="DJIBRIL26"
-        IBRAHIMA="IBRAHIMA26"
-        POUYE="POUYE26"
+        POUYE = st.secrets["credentials"]["pouye"]
 
         st.markdown(f"<h4 style='text-align: center;'>!---------- Stock restant après les ventes du {datea} ----------!</h4><br>", unsafe_allow_html=True)
         #st.subheader("Stock restant après les ventes")
@@ -574,17 +569,11 @@ elif menu == "FICHE":
         st.sidebar.markdown("---")
         password = st.sidebar.text_input("Code d'accès requis", type="password")
         # Récupération sécurisée du secret
-        """VALERIE = st.secrets["credentials"]["valerie"]
+        VALERIE = st.secrets["credentials"]["valerie"]
         OMAR = st.secrets["credentials"]["omar"]
         MANSOUR = st.secrets["credentials"]["mansour"]
         DJIBRIL = st.secrets["credentials"]["djibril"]
-        IBRAHIMA = st.secrets["credentials"]["ibrahima"]"""
-        VALERIE="KOFFI26"
-        OMAR="OMAR26"
-        MANSOUR="MANSOUR26"
-        DJIBRIL="DJIBRIL26"
-        IBRAHIMA="IBRAHIMA26"
-        POUYE="POUYE26"
+        IBRAHIMA = st.secrets["credentials"]["ibrahima"]
 
         if password == DJIBRIL:
             prom ="TATA 1"
