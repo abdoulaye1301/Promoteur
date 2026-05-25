@@ -889,13 +889,14 @@ elif menu == "FICHE":
                 donnee_RZ_Livr= donnee_RZ[(donnee_RZ["Operation"] == "Livraison") & (donnee_RZ["Semaine"] == semaine)]
                 CA_donnee_RZ=donnee_RZ_Livr["Prix Total"].sum()
                 Remise = pd.read_excel("Remise.xlsx", engine='openpyxl')
+                Remises = Remise[(Remise["Numero_semaine"] == semaine)]
 
                 colonnne= st.columns(2)
                 
                 colonnne[0].metric("CA RZ", f"{CA_donnee_RZ:,.2f}".replace(",", " ")+" XOF")
                 colonnne[1].metric("CA TATA", f"{donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
                 colonnne[0].metric("CA TOTAL (RZ + TATA)", f"{CA_donnee_RZ+donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
-                colonnne[1].metric("REMISE", f"{Remise['Montant'].sum():,.2f}".replace(",", " ")+" XOF")
+                colonnne[1].metric("REMISE", f"{Remises['Montant'].sum():,.2f}".replace(",", " ")+" XOF")
                 #ca_restant=descente_T2["Montant"].sum()+descente_T1["Montant"].sum() +descente_T3["Montant"].sum()
                 #rest=stock_descente_T1.sum()+stock_descente_T2.sum()+stock_descente_T3.sum()
 
@@ -908,7 +909,7 @@ elif menu == "FICHE":
                 st.markdown(f"<h3 style='text-align: center;'>SALAIRES + TRANSPORT + STATIONNEMENT : {Depenses:,.2f}".replace(",", " ")+" XOF</h3>", unsafe_allow_html=True)
                 
                 # MONTANT A VERSER PAR OMAR = CA TATA + CA RZ - REMISE - TRANSPORT - STATIONNEMENT - SALAIRE TATAS
-                mnt_verser = (CA_donnee_RZ + donnee_ordre_F['Montant A verser'].sum()) - (Depenses + Remise['Montant'].sum())
+                mnt_verser = (CA_donnee_RZ + donnee_ordre_F['Montant A verser'].sum()) - (Depenses + Remises['Montant'].sum())
                 st.markdown(f"<h2 style='text-align: center;'>MONTANT À VERSER PAR OMAR : {mnt_verser:,.2f}".replace(",", " ")+" XOF</h2>", unsafe_allow_html=True)
                 
 
