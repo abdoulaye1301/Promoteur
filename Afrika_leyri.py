@@ -218,8 +218,11 @@ if menu == "AGREGATION":
                 lambda row: 'OK' if row['Stock Théorique'] == row['Stock Restant'] else 'Différence',
                 axis=1
             )
-            df_final1 = df_final.drop("tata", axis=1).copy()
-            st.dataframe(df_final1)
+            if prom == "Tous les TATAS":
+                st.dataframe(df_final)
+            else:
+                df_final1 = df_final.drop("tata", axis=1).copy()
+                st.dataframe(df_final1)
         #-----------------------------------------------------------------#
         #---------------------------- Rapport de Omar ------------------#
             donnee_agr = (
