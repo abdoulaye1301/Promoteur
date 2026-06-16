@@ -184,19 +184,31 @@ if menu == "AGREGATION":
                 descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == dat)]
             
             # Regrouper par tata et produit
-            stock_init = stock_lundi.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
-            ventes_total = ventes.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
-            stock_descente = descente.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+            if prom == "Tous les TATAS":
+                stock_init = stock_lundi.groupby(['Produit'])['Quantites_Cartons'].sum()
+                ventes_total = ventes.groupby([ 'Produit'])['Quantites_Cartons'].sum()
+                stock_descente = descente.groupby(['Produit'])['Quantites_Cartons'].sum()
+                
+                stock_Theorique = stock_init.subtract(ventes_total, fill_value=0)
 
-            # Calcul du stock restant
-            stock_Theorique = stock_init.subtract(ventes_total, fill_value=0)
+                df_final = stock_Theorique.reset_index().rename(columns={'Quantites_Cartons': 'Stock Théorique'})
+                df_final['Stock Restant'] = df_final.apply(
+                    lambda row: stock_descente.get((row['Produit']), 0), axis=1
+                )
+            else:
+                stock_init = stock_lundi.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+                ventes_total = ventes.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
+                stock_descente = descente.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
 
-            # Fusionner les résultats dans un seul DataFrame
-            df_final = stock_Theorique.reset_index().rename(columns={'Quantites_Cartons': 'Stock Théorique'})
-            df_final['Stock Restant'] = df_final.apply(
-                lambda row: stock_descente.get((row['tata'], row['Produit']), 0), axis=1
-            )
-            
+                # Calcul du stock restant
+                stock_Theorique = stock_init.subtract(ventes_total, fill_value=0)
+
+                # Fusionner les résultats dans un seul DataFrame
+                df_final = stock_Theorique.reset_index().rename(columns={'Quantites_Cartons': 'Stock Théorique'})
+                df_final['Stock Restant'] = df_final.apply(
+                    lambda row: stock_descente.get((row['tata'], row['Produit']), 0), axis=1
+                )
+                
             # Arrondir à 2 chiffres après la virgule
             df_final['Stock Théorique'] = df_final['Stock Théorique'].astype(float).round(2)
             df_final['Stock Restant'] = df_final['Stock Restant'].astype(float).round(2)
