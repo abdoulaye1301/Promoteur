@@ -149,9 +149,9 @@ if menu == "AGREGATION":
             if password == OMAR or password == POUYE:
                 st.success("Accès autorisé, vous êtes connectés avec les identifiants de "+("OMAR" if password == OMAR else "POUYE"))
                 if sous_menu=="Stock":
-                        prom = colone[3].selectbox("", ["TATA 1", "TATA 2", "TATA 3"])
+                        prom = colone[3].selectbox("", ["TATA 1", "TATA 2", "TATA 3","Tous les TATAS"])
                 else:
-                    prom = colone[4].selectbox("", ["TATA 1", "TATA 2", "TATA 3"]) 
+                    prom = colone[4].selectbox("", ["TATA 1", "TATA 2", "TATA 3","Tous les TATAS"]) 
             elif password == MANSOUR:
                 st.success("Accès autorisé, vous êtes connectés avec les identifiants de MANSOUR")
                 prom = "TATA 2"
@@ -162,12 +162,14 @@ if menu == "AGREGATION":
                 st.success("Accès autorisé, vous êtes connectés avec les identifiants de IBRAHIMA")
                 prom = "TATA 3"
         
-        
-
-            if periode == "Jour":
-                stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
-                ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement['Numero_semaine'] == semaine) & (Chargement["Date"] <= dat) & (Chargement['tata'] == prom)]
-                descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == dat) & (Chargement['tata'] == prom)]
+            if periode == "Jour" :
+                if prom == "Tous les TATAS":
+                    st.error("Veuillez sélectionner un TATA spécifique pour la vue Jour.")
+                else:
+                    stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
+                    ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement['Numero_semaine'] == semaine) & (Chargement["Date"] <= dat) & (Chargement['tata'] == prom)]
+                    descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == dat) & (Chargement['tata'] == prom)]
+           
             elif periode == "Semaine":
                 stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine) & (Chargement['tata'] == prom)]
                 ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement["Numero_semaine"] == semaine) & (Chargement['tata'] == prom)]
@@ -176,6 +178,11 @@ if menu == "AGREGATION":
                 #dat = colone[2].selectbox("", min_date)
                 descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == prom)]
 
+            elif periode == "Semaine" and prom == "Tous les TATAS":
+                stock_lundi = Chargement[(Chargement['Operation'] == 'Stock Lundi') & (Chargement['Numero_semaine'] == semaine)]
+                ventes = Chargement[(Chargement['Operation'] == 'Vente') & (Chargement['Numero_semaine'] == semaine) & (Chargement["Date"] <= dat)]
+                descente = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == dat)]
+            
             # Regrouper par tata et produit
             stock_init = stock_lundi.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
             ventes_total = ventes.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
@@ -311,14 +318,22 @@ if menu == "AGREGATION":
             # Génération et bouton
             # Génération de l'image PNG avec en-tête
             if periode == "Jour":
-                zone = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
-                nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())-1
-                commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["Commentaire"].dropna().unique().tolist()
+                if prom == "Tous les TATAS":
+                    zone="Toutes les zones"
+                    nb_promoteurs=len(Chargement[(Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
+                else:
+                    zone = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
+                    nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())-1
+                    commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["Commentaire"].dropna().unique().tolist()
             elif periode == "Semaine":
-                # Pour la semaine, on peut prendre la zone de la première entrée de la semaine
-                zone=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["zone"].dropna().unique()
-                nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
-                commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["Commentaire"].dropna().unique().tolist()
+                if prom == "Tous les TATAS":
+                    zone="Toutes les zones"
+                    nb_promoteurs=len(Chargement[(Chargement["Numero_semaine"] == semaine) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
+                else:
+                    # Pour la semaine, on peut prendre la zone de la première entrée de la semaine
+                    zone=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["zone"].dropna().unique()
+                    nb_promoteurs=len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
+                    commente=Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["Commentaire"].dropna().unique().tolist()
             # Si le commentaire est vide, on utilise une chaîne vide
             commente=[]
             if len(commente) == 0: 
