@@ -438,8 +438,13 @@ if menu == "AGREGATION":
         colonnne= st.columns(2)
         
         colonnne[0].metric("💴 CA RZ", f"{CA_donnee_RZ:,.2f}".replace(",", " ")+" XOF")
-        colonnne[1].metric("💴 CA RZ + TATA", f"{CA_donnee_RZ+donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
-        colonnne[0].metric("💴 CA TATA", f"{donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+        if semaine=="S27":
+            colonnne[1].metric("💴 CA RZ + TATA", f"{CA_donnee_RZ-210000+donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+            colonnne[0].metric("💴 CA TATA", f"{-210000+donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+        else:
+            colonnne[1].metric("💴 CA RZ + TATA", f"{CA_donnee_RZ+donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+            colonnne[0].metric("💴 CA TATA", f"{donnee_ordre["Montant A verser"].sum():,.2f}".replace(",", " ")+" XOF")
+
         colonnne[1].metric("🔢 Quantité vendue", f"{donnee_ordre["Quantités"].sum():,.2f}".replace(",", " "))
         ca_restant=descente_T2["Montant"].sum()+descente_T1["Montant"].sum() +descente_T3["Montant"].sum()
         rest=stock_descente_T1.sum()+stock_descente_T2.sum()+stock_descente_T3.sum()
