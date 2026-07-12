@@ -485,7 +485,7 @@ elif menu == "DETAIL":
                         .reset_index()
                     )
 
-                    st.subheader("Ventes de promoteurs")
+                    st.subheader("Ventes des promoteurs")
                     donnee_agre = donnee_agre.rename(
                         columns={
                             "tata": "TATA",
@@ -502,7 +502,7 @@ elif menu == "DETAIL":
                         .reset_index()
                     )
 
-                    st.subheader("Ventes de promoteurs")
+                    st.subheader("Ventes des promoteurs")
                     donnee_agre = donnee_agre.rename(
                         columns={
                             "tata": "TATA",
