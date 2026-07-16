@@ -720,7 +720,14 @@ elif menu == "FICHE":
             'Date': 'Jours travaillés'
         }, inplace=True)
 
-        suivi['Salaire'] = suivi['Jours travaillés'] * 4000
+        # suivi['Salaire'] = suivi['Jours travaillés'] * 4000
+
+        suivi["Salaire"] = suivi.apply(
+            lambda row: row["Jours travaillés"] * 5000
+            if row["Nom"].strip().upper() == "DJIBRIL THIOMBANE"
+            else row["Jours travaillés"] * 4000,
+            axis=1
+        )
 
         total = suivi['Salaire'].sum()
 
