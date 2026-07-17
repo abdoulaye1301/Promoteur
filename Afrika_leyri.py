@@ -922,7 +922,14 @@ elif menu == "FICHE":
                     'Date': 'Jours travaillés'
                 }, inplace=True)
 
-                suivi_sal['Salaire'] = suivi_sal['Jours travaillés'] * 4000
+                #suivi_sal['Salaire'] = suivi_sal['Jours travaillés'] * 4000
+
+                suivi["Salaire"] = suivi.apply(
+                    lambda row: row["Jours travaillés"] * 5000
+                    if row["Nom"].strip().upper() == "DJIBRIL THIOMBANE"
+                    else row["Jours travaillés"] * 4000,
+                    axis=1
+                )
 
                 Salaire_Tatas = suivi_sal['Salaire'].sum()
                 #st.dataframe(donnee_ordre)
@@ -936,12 +943,9 @@ elif menu == "FICHE":
                 colonnne= st.columns(2)
                 
                 colonnne[0].metric("CA RZ", f"{CA_donnee_RZ:,.2f}".replace(",", " ")+" XOF")
-                if semaine=="S27":
-                    colonnne[1].metric("CA RZ + TATA", f"{CA_donnee_RZ-210000+donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
-                    colonnne[0].metric("CA TATA", f"{-210000+donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
-                else:
-                    colonnne[1].metric("CA RZ + TATA", f"{CA_donnee_RZ+donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
-                    colonnne[0].metric("CA TATA", f"{donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
+                
+                colonnne[1].metric("CA RZ + TATA", f"{CA_donnee_RZ+donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
+                colonnne[0].metric("CA TATA", f"{donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
                 colonnne[0].metric("CA TOTAL (RZ + TATA)", f"{CA_donnee_RZ+donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
                 colonnne[1].metric("REMISE", f"{Remises['Montant'].sum():,.2f}".replace(",", " ")+" XOF")
                 #ca_restant=descente_T2["Montant"].sum()+descente_T1["Montant"].sum() +descente_T3["Montant"].sum()
@@ -956,10 +960,8 @@ elif menu == "FICHE":
                 st.markdown(f"<h3 style='text-align: center;'>SALAIRES + TRANSPORT + STATIONNEMENT : {Depenses:,.2f}".replace(",", " ")+" XOF</h3>", unsafe_allow_html=True)
                 
                 # MONTANT A VERSER PAR OMAR = CA TATA + CA RZ - REMISE - TRANSPORT - STATIONNEMENT - SALAIRE TATAS
-                if semaine=="S27":
-                    mnt_verser = (CA_donnee_RZ-210000+donnee_ordre_F['Montant A verser'].sum()) - (Depenses + Remises['Montant'].sum())
-                else:
-                    mnt_verser = (CA_donnee_RZ + donnee_ordre_F['Montant A verser'].sum()) - (Depenses + Remises['Montant'].sum())
+                
+                mnt_verser = (CA_donnee_RZ + donnee_ordre_F['Montant A verser'].sum()) - (Depenses + Remises['Montant'].sum())
                 st.markdown(f"<h2 style='text-align: center;'>MONTANT À VERSER PAR OMAR : {mnt_verser:,.2f}".replace(",", " ")+" XOF</h2>", unsafe_allow_html=True)
                 
 
