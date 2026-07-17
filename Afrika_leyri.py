@@ -924,7 +924,7 @@ elif menu == "FICHE":
 
                 #suivi_sal['Salaire'] = suivi_sal['Jours travaillés'] * 4000
 
-                suivi["Salaire"] = suivi.apply(
+                suivi_sal["Salaire"] = suivi_sal.apply(
                     lambda row: row["Jours travaillés"] * 5000
                     if row["Nom"].strip().upper() == "DJIBRIL THIOMBANE"
                     else row["Jours travaillés"] * 4000,
