@@ -338,27 +338,27 @@ if menu == "AGREGATION":
 
             if periode == "Jour":
                 if prom == "Tous les TATAS":
-                    zone = "Toutes les zones"
-                    nb_promoteurs = len(Chargement[(Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
+                    zone_str = "Toutes les zones"
+                    nb_promoteurs = len(Chargement[(Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat) & (Chargement['Prenom_Nom_Promoteur'] != "Autre") & (Chargement['Prenom_Nom_Promoteur'].notna())]["Prenom_Nom_Promoteur"].unique())
                     commente = ["Rapport global Tous les TATAS"]
                 else:
-                    zone = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
-                    nb_promoteurs = len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].dropna().unique())
+                    zone_vals = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["zone"].dropna().unique()
+                    zone_str = str(zone_vals[0]) if len(zone_vals) > 0 else "Non définie"
+                    nb_promoteurs = len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat) & (Chargement['Prenom_Nom_Promoteur'] != "Autre") & (Chargement['Prenom_Nom_Promoteur'].notna())]["Prenom_Nom_Promoteur"].unique())
                     commente = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Date'] == dat)]["Commentaire"].dropna().unique().tolist()
             elif periode == "Semaine":
                 if prom == "Tous les TATAS":
-                    zone = "Toutes les zones"
-                    nb_promoteurs = len(Chargement[(Chargement["Numero_semaine"] == semaine) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
+                    zone_str = "Toutes les zones"
+                    nb_promoteurs = len(Chargement[(Chargement["Numero_semaine"] == semaine) & (Chargement['Prenom_Nom_Promoteur'] != "Autre") & (Chargement['Prenom_Nom_Promoteur'].notna())]["Prenom_Nom_Promoteur"].unique())
                     commente = ["Rapport global Tous les TATAS"]
                 else:
-                    zone = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["zone"].dropna().unique()
-                    nb_promoteurs = len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Prenom_Nom_Promoteur'] != "Autre")]["Prenom_Nom_Promoteur"].unique())
+                    zone_vals = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["zone"].dropna().unique()
+                    zone_str = str(zone_vals[0]) if len(zone_vals) > 0 else "Non définie"
+                    nb_promoteurs = len(Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine) & (Chargement['Prenom_Nom_Promoteur'] != "Autre") & (Chargement['Prenom_Nom_Promoteur'].notna())]["Prenom_Nom_Promoteur"].unique())
                     commente = Chargement[(Chargement['tata'] == prom) & (Chargement["Numero_semaine"] == semaine)]["Commentaire"].dropna().unique().tolist()
             
             if not commente: 
                 commente.append("Aucune observation") 
-
-            zone_str = zone[0] if isinstance(zone, (list, np.ndarray, pd.Series)) and len(zone) > 0 else str(zone)
 
             png_bytes = generate_png_report(df_final_total1, datea, zone_str, nb_promoteurs, commente[0])
             st.image(png_bytes, caption="", use_container_width=True)
@@ -396,7 +396,7 @@ if menu == "AGREGATION":
         descente_T2 = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == "TATA 2")]
         stock_descente_T2 = descente_T2.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
 
-        descente_T3 = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine'] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == "TATA 3")]
+        descente_T3 = Chargement[(Chargement['Operation'] == 'Stock Descente') & (Chargement['Numero_semaine"] == semaine) & (Chargement['Date'] == min_dat) & (Chargement['tata'] == "TATA 3")]
         stock_descente_T3 = descente_T3.groupby(['tata', 'Produit'])['Quantites_Cartons'].sum()
 
         colonnne= st.columns(2)
