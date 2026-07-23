@@ -236,6 +236,8 @@ if menu == "AGREGATION":
                 donne_vente_sum = donne_vente.groupby(["Produit"])["Quantites_Cartons"].sum().reset_index()
                 donne_vente_sum = donne_vente_sum.rename(columns={"Quantites_Cartons": "Quantités vendues"})
                 donnee_ordr = pd.merge(donn, donne_vente_sum, on=["Produit"], how="left")
+                if "TATA" in donnee_ordr.columns:
+                    donnee_ordr = donnee_ordr.drop("TATA", axis=1)
             else:
                 donnee_ordr = pd.merge(donn, donnee_ordr, on=["TATA", "Produit"], how="left")
 
@@ -261,7 +263,7 @@ if menu == "AGREGATION":
             df_final_total["Stock Restant"] = df_final_total["Stock Restant"].round(2)
             df_final_total["Quantités vendues"] = df_final_total["Quantités vendues"].round(2)
             
-            if prom != "Tous les TATAS" and "TATA" in df_final_total.columns:
+            if "TATA" in df_final_total.columns:
                 df_final_total1 = df_final_total.drop("TATA", axis=1).copy()
             else:
                 df_final_total1 = df_final_total.copy()
