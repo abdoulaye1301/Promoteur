@@ -830,8 +830,7 @@ elif menu == "FICHE":
 
                 colonnne= st.columns(2)
                 colonnne[0].metric("CA RZ", f"{CA_donnee_RZ:,.2f}".replace(",", " ")+" XOF")
-                colonnne[1].metric("CA RZ + TATA", f"{CA_donnee_RZ+donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
-                colonnne[0].metric("CA TATA", f"{donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
+                colonnne[1].metric("CA TATA", f"{donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
                 colonnne[0].metric("CA TOTAL (RZ + TATA)", f"{CA_donnee_RZ+donnee_ordre_F['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
                 colonnne[1].metric("REMISE", f"{Remises['Montant'].sum():,.2f}".replace(",", " ")+" XOF")
 
