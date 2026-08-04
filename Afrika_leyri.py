@@ -407,8 +407,8 @@ if menu == "AGREGATION":
         colonnne[0].metric("💴 CA TATA", f"{donnee_ordre['Montant A verser'].sum():,.2f}".replace(",", " ")+" XOF")
         colonnne[1].metric("🔢 Quantité vendue", f"{donnee_ordre['Quantités'].sum():,.2f}".replace(",", " "))
         
-        ca_restant=descente_T2["Montant"].sum()+descente_T1["Montant"].sum() +descente_T3["Montant"].sum()-5324875
-        rest=stock_descente_T1.sum()+stock_descente_T2.sum()+stock_descente_T3.sum()-509.25
+        ca_restant=descente_T2["Montant"].sum()+descente_T1["Montant"].sum() +descente_T3["Montant"].sum()
+        rest=stock_descente_T1.sum()+stock_descente_T2.sum()+stock_descente_T3.sum()
 
         colonnne[0].metric("🚐 Transport TATA", f"{statio['Transport'].sum():,.0f}".replace(",", " ")+" XOF")
         colonnne[1].metric("🅿️ Stationnement", f"{statio['Stationnement'].sum():,.0f}".replace(",", " ")+" XOF")
