@@ -658,7 +658,7 @@ elif menu == "FICHE":
 
         suivi["Salaire"] = suivi.apply(
             lambda row: row["Jours travaillés"] * 5000
-            if row["Nom"].strip().upper() == "DJIBRIL THIOMBANE"
+            if row["Nom"].strip().upper() in ["DJIBRIL THIOMBANE","ISSA KANE","CHAMSDINE AIDARA","MOHAMED DIONE"]
             else row["Jours travaillés"] * 4000,
             axis=1
         )
@@ -816,7 +816,7 @@ elif menu == "FICHE":
 
                 suivi_sal["Salaire"] = suivi_sal.apply(
                     lambda row: row["Jours travaillés"] * 5000
-                    if row["Nom"].strip().upper() == "DJIBRIL THIOMBANE"
+                    if row["Nom"].strip().upper() in ["DJIBRIL THIOMBANE","ISSA KANE","CHAMSDINE AIDARA","MOHAMED DIONE"]
                     else row["Jours travaillés"] * 4000,
                     axis=1
                 )
