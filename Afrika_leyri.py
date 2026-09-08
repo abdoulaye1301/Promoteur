@@ -683,7 +683,7 @@ elif menu == "FICHE":
         from io import BytesIO
         import os
 
-        def generate_pdf_paie(df, prom, jour_min, jour_max, mois_lettre, annee):
+        def generate_pdf_paie(df, prom, jour_min, jour_max, mois_lettre, annee, mois_lettre_max, mois_num, mois_max):
             buffer = BytesIO()
             doc = SimpleDocTemplate(buffer, pagesize=A4,
                                     rightMargin=2*cm, leftMargin=2*cm,
@@ -691,7 +691,10 @@ elif menu == "FICHE":
 
             styles = getSampleStyleSheet()
             elements = []
-            texte_periode = f"DU {jour_min} AU {jour_max} {mois_lettre} {annee}"
+            if mois_num != mois_max:
+                texte_periode = f"DU {jour_min} {mois_lettre} AU {jour_max} {mois_lettre_max} {annee}"
+            else:
+                texte_periode = f"DU {jour_min} AU {jour_max} {mois_lettre} {annee}"
             logo_path = "afrika_leyri_sas_logo.jpeg"
 
             if os.path.exists(logo_path):
@@ -778,14 +781,22 @@ elif menu == "FICHE":
         df_total = suivi.copy()
         df_total.loc[len(df_total)] = ["TOTAL", "", total]
         
-        pdf_file = generate_pdf_paie(df_total, prom, jour_min, jour_max, mois_lettre, annee)
+        pdf_file = generate_pdf_paie(df_total, prom, jour_min, jour_max, mois_lettre, annee, mois_lettre_max, mois_num, mois_max)
 
-        st.download_button(
-            label="📥 Télécharger la fiche de paie PDF",
-            data=pdf_file,
-            file_name=f"FICHE DE PAIE {prom} DU {jour_min:02d} AU {jour_max:02d} {mois_num}.pdf",
-            mime="application/pdf"
-        )
+        if mois_num != mois_max:
+            st.download_button(
+                label="📥 Télécharger la fiche de paie PDF",
+                data=pdf_file,
+                file_name=f"FICHE DE PAIE {prom} DU {jour_min:02d} {mois_num} AU {jour_max:02d} {mois_max} {annee}.pdf",
+                mime="application/pdf"
+            )
+        else:
+            st.download_button(
+                label="📥 Télécharger la fiche de paie PDF",
+                data=pdf_file,
+                file_name=f"FICHE DE PAIE {prom} DU {jour_min:02d} AU {jour_max:02d} {mois_num}.pdf",
+                mime="application/pdf"
+            )
         
         if password in [OMAR, VALERIE]:
             if password == OMAR and choix_om == "FICHE":
