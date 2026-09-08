@@ -662,7 +662,7 @@ elif menu == "FICHE":
         }, inplace=True)
 
         suivi["Salaire"] = suivi.apply(
-            lambda row: row["Jours travaillés"] * 5000
+            lambda row: row["Jours travaillés"] * 4000
             if row["Nom"].strip().upper() in ["DJIBRIL THIOMBANE (CHARRETIER)","ISSA KANE (CHARRETIER)","CHAMSDINE AIDARA (CHARRETIER)","MOHAMED DIONE (CHARRETIER)"]
             else row["Jours travaillés"] * 4000,
             axis=1
