@@ -753,7 +753,7 @@ elif menu == "FICHE":
                     ""
                 ])
 
-            table = Table(data, colWidths=[7*cm, 4*cm, 3*cm, 2*cm])
+            table = Table(data, colWidths=[6.5*cm, 4*cm, 3*cm, 2.5*cm])
 
             table.setStyle(TableStyle([
                 ('GRID', (0,0), (-1,-1), 1, colors.black),
