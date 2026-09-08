@@ -662,7 +662,7 @@ elif menu == "FICHE":
         }, inplace=True)
 
         suivi["Salaire"] = suivi.apply(
-            lambda row: row["Jours travaillés"] * 4000
+            lambda row: row["Jours travaillés"] * 5000
             if row["Nom"].strip().upper() in ["DJIBRIL THIOMBANE (CHARRETIER)","ISSA KANE (CHARRETIER)","CHAMSDINE AIDARA (CHARRETIER)","MOHAMED DIONE (CHARRETIER)"]
             else row["Jours travaillés"] * 4000,
             axis=1
@@ -753,7 +753,7 @@ elif menu == "FICHE":
                     ""
                 ])
 
-            table = Table(data, colWidths=[5*cm, 4*cm, 4*cm, 3*cm])
+            table = Table(data, colWidths=[7*cm, 4*cm, 3*cm, 2*cm])
 
             table.setStyle(TableStyle([
                 ('GRID', (0,0), (-1,-1), 1, colors.black),
