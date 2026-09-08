@@ -634,6 +634,7 @@ elif menu == "FICHE":
         jour_min = data_semaine["Date"].min().day
         jour_max = data_semaine["Date"].max().day
         mois_num = data_semaine["Date"].min().month
+        mois_max = data_semaine["Date"].max().month
         annee=data_semaine["Date"].min().year
 
         mois_fr = {
@@ -644,8 +645,12 @@ elif menu == "FICHE":
         }
 
         mois_lettre = mois_fr[mois_num]
-        texte_periode = f"DU {jour_min} AU {jour_max} {mois_lettre} {annee}"
-        st.markdown(f"""<h4 style='text-align: center;'>FICHE DE PAIE {prom} DU {texte_periode}</h4>""", unsafe_allow_html=True)
+        mois_lettre_max = mois_fr[mois_max]
+        if mois_num != mois_max:
+            texte_periode = f"DU {jour_min} {mois_lettre} AU {jour_max} {mois_lettre_max} {annee}"
+        else:
+            texte_periode = f"DU {jour_min} AU {jour_max} {mois_lettre} {annee}"
+        st.markdown(f"""<h4 style='text-align: center;'>FICHE DE PAIE {prom} {texte_periode}</h4>""", unsafe_allow_html=True)
 
         suivi = data_semaine.groupby(
             ['Prenom_Nom_Promoteur']
@@ -657,8 +662,8 @@ elif menu == "FICHE":
         }, inplace=True)
 
         suivi["Salaire"] = suivi.apply(
-            lambda row: row["Jours travaillés"] * 5000
-            if row["Nom"].strip().upper() in ["DJIBRIL THIOMBANE","ISSA KANE","CHAMSDINE AIDARA","MOHAMED DIONE"]
+            lambda row: row["Jours travaillés"] * 4000
+            if row["Nom"].strip().upper() in ["DJIBRIL THIOMBANE (CHARRETIER)","ISSA KANE (CHARRETIER)","CHAMSDINE AIDARA (CHARRETIER)","MOHAMED DIONE (CHARRETIER)"]
             else row["Jours travaillés"] * 4000,
             axis=1
         )
